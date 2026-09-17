@@ -34,11 +34,6 @@ yarn-error.log*
 .env*
 !.env.local.example
 
-# secrets accidentally committed as plain files rather than .env — never track these
-API key
-*.key
-secrets.txt
-
 # vercel
 .vercel
 

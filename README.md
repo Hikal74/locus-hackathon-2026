@@ -14,8 +14,7 @@ A structured, five-step questionnaire produces a profile. A deterministic scorin
 
 ## Key features
 
-- **AI Advisor** — a retrieval-grounded Gemini advisor that reasons across your full profile (including free-text achievements/goals) and a relevant slice of the university database to produce a personalized analysis, not a template.
-- **Guided profile** — a progressive 6-step form instead of one long questionnaire, including a free-text step for anything the structured fields don't capture.
+- **Guided profile** — a progressive 5-step form instead of one long questionnaire.
 - **Diagnosis** — strengths, constraints, and gaps read directly from the profile, plus a readiness view that is never framed as an admission probability.
 - **Ranked recommendations** — a transparent, six-factor scoring algorithm with a visible score breakdown on every result.
 - **What-If mode** — change budget or country preference and watch the shortlist and reasoning update live.
@@ -34,12 +33,7 @@ No LLM decides which universities appear. A plain TypeScript pipeline (`src/lib/
 
 ## AI usage
 
-Two Gemini-powered features, both server-side, no other AI provider anywhere in the codebase:
-
-- **AI Advisor** (`/api/advisor`, surfaced on the Recommendations page) — a retrieval-grounded advisory pipeline. The deterministic engine still decides which universities are eligible (same hard filters, same scoring); Gemini reasons across the student's full profile — including free-text achievements, projects, and goals the scoring engine can't parse — plus that already-filtered database evidence, to produce a personalized, structured analysis. On failure, it shows a real error with a retry option — never the deterministic engine's output disguised as an AI answer.
-- **Explanation rephrasing** (`/api/explain`) — rephrases already-computed "why it fits" text into warmer prose, constrained by a prompt that forbids adding new facts, with the deterministic template text as an automatic, verified fallback when no API key is configured or the call fails.
-
-Neither feature ever silently retries against a different model or provider — a failed Gemini call returns a handled, typed error. AI never selects which universities are eligible to appear at all; that stays deterministic. Full detail: [`docs/AI_USAGE.md`](docs/AI_USAGE.md).
+Claude is used in exactly one place: rephrasing already-computed explanation text into warmer prose, constrained by a prompt that forbids adding new facts, with the deterministic template text as an automatic, verified fallback when no API key is configured or the call fails. AI never selects which universities appear. Full detail: [`docs/AI_USAGE.md`](docs/AI_USAGE.md).
 
 ## Data sources and verification
 
@@ -47,7 +41,7 @@ Every tuition, deadline, requirement, and scholarship figure is labeled `verifie
 
 ## Tech stack
 
-Next.js 16 (App Router), TypeScript, Tailwind CSS v4, Vitest. Google Gemini API (`@google/genai`) for the AI advisor and explanation layers; Zod for request/response validation. No database — local persistence via `localStorage`, accessed through a `useSyncExternalStore`-based hook.
+Next.js 16 (App Router), TypeScript, Tailwind CSS v4, Vitest. Claude API (`@anthropic-ai/sdk`) for the optional explanation layer. No database — local persistence via `localStorage`, accessed through a `useSyncExternalStore`-based hook.
 
 ## Architecture
 
@@ -64,8 +58,8 @@ npm install
 Copy `.env.local.example` to `.env.local` and fill in real values. Both are optional — the app runs fully functional without them:
 
 ```
-GOOGLE_AI_API_KEY=      # enables live AI rephrasing; falls back to templates if unset
-GEMINI_MODEL=           # optional override, defaults to gemini-3.6-flash
+ANTHROPIC_API_KEY=      # enables live AI rephrasing; falls back to templates if unset
+ANTHROPIC_MODEL=        # optional override, defaults to claude-opus-5
 ```
 
 ## Local development
@@ -91,8 +85,7 @@ Deployed via Vercel. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the 
 
 - Dataset covers Computer Science, Business, Engineering, Natural Sciences, and Humanities across 9 universities in the USA, Kazakhstan, and China. No Medicine or Arts program data was found for these institutions.
 - No accounts or cross-device sync — state is per-browser (`localStorage`).
-- Both Gemini features (AI Advisor, explanation rephrasing) require a provisioned Google AI Studio (Gemini) API key; without one, the AI Advisor shows a clear "not configured" error and rephrasing falls back to deterministic template text. Neither's live model call has been exercised in this build — request validation, retrieval, and error handling have been (see `docs/AI_USAGE.md`).
-- AI Advisor follow-up conversation history is in-memory only and resets on page reload.
+- The live AI rephrasing path requires a provisioned Anthropic API key; only the deterministic fallback has been exercised in this build.
 
 ## Documentation
 
