@@ -7,6 +7,7 @@ import { ClayCard } from "@/components/clay/ClayCard";
 import { ClayChip } from "@/components/clay/ClayChip";
 import { ClayInput } from "@/components/clay/ClayInput";
 import { ClayProgress } from "@/components/clay/ClayProgress";
+import { ClayTextarea } from "@/components/clay/ClayTextarea";
 import { useProfile } from "@/lib/store/profile-context";
 import { programs } from "@/lib/data/dataset";
 import type { Country, FieldOfStudy, LanguageRequirement, StudentProfile } from "@/lib/data/types";
@@ -40,6 +41,7 @@ type Draft = {
   englishLevel: string;
   examsCompleted: string[];
   intendedIntake: string;
+  additionalContext: string;
 };
 
 const INITIAL_DRAFT: Draft = {
@@ -53,9 +55,10 @@ const INITIAL_DRAFT: Draft = {
   englishLevel: "",
   examsCompleted: [],
   intendedIntake: "Fall 2027",
+  additionalContext: "",
 };
 
-const STEP_COUNT = 5;
+const STEP_COUNT = 6;
 
 function toggle<T>(list: T[], value: T): T[] {
   return list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
@@ -83,6 +86,8 @@ export default function ProfilePage() {
         return true;
       case 4:
         return true;
+      case 5:
+        return true;
       default:
         return false;
     }
@@ -108,6 +113,7 @@ export default function ProfilePage() {
         prioritizeResearch: draft.prioritizeResearch,
         prioritizeScholarship: draft.prioritizeScholarship,
       },
+      additionalContext: draft.additionalContext.trim() || undefined,
     };
 
     setProfile(profile);
@@ -251,6 +257,27 @@ export default function ProfilePage() {
         )}
 
         {step === 4 && (
+          <>
+            <h1 className="text-2xl font-semibold text-ink">Anything else worth knowing? (optional)</h1>
+            <p className="text-sm text-ink-soft">
+              Projects, competitions, research, leadership, awards, volunteering, career goals, or anything else
+              about your situation. This isn&apos;t scored by the matching algorithm above — it goes straight to the
+              AI advisor, which reads it and reasons about it directly, so write in your own words instead of trying
+              to fit a form field.
+            </p>
+            <ClayTextarea
+              label="In your own words"
+              placeholder="e.g. Built a machine-learning project that placed top 3 in a national science fair; captain of the robotics club; want to eventually work in AI research but worried my portfolio is thin outside of coursework…"
+              rows={6}
+              maxLength={4000}
+              value={draft.additionalContext}
+              onChange={(e) => update("additionalContext", e.target.value)}
+              hint={`${draft.additionalContext.length}/4000`}
+            />
+          </>
+        )}
+
+        {step === 5 && (
           <>
             <h1 className="text-2xl font-semibold text-ink">One more thing</h1>
             <ClayInput

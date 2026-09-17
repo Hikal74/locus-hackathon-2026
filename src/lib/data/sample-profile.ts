@@ -23,4 +23,6 @@ export const sampleProfile: StudentProfile = {
     prioritizeScholarship: true,
     campusSize: "medium",
   },
+  additionalContext:
+    "Built a machine learning project that classifies plant diseases from photos, used by a couple of local farmers as a pilot — no formal competition result, just a personal/school project. Captain of the school's robotics club (2 years). No published research or national-level competition placements yet. Long-term goal is to work in applied AI, ideally research-adjacent. Main worry: portfolio feels thin on formal recognition (no olympiad medals, no research papers) compared to what top CS programs seem to expect.",
 };

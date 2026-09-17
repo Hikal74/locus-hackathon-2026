@@ -22,7 +22,7 @@ A secondary-school student who knows roughly what they want to study but is over
 | Decision | Choice | Rationale |
 |---|---|---|
 | Data backend | Local persistence (`localStorage`) rather than a database | Removes an external dependency for demo reliability; the data-access layer (`src/lib/data/dataset.ts`) is isolated so a real database can be substituted without touching the pages that consume it. |
-| AI integration | Claude API used as an optional copy-polish layer, with a deterministic template as an automatic, verified fallback | No LLM decides which universities appear — see §7. The fallback path runs whenever no API key is configured and has been verified end-to-end; see `docs/AI_USAGE.md`. |
+| AI integration | Google Gemini API (single provider, no secondary AI fallback), used two ways: a retrieval-grounded AI advisor that reasons over the student's profile plus database evidence, and a smaller copy-polish layer with a deterministic template fallback | No LLM decides which universities are *eligible* — that stays deterministic (see §7). Gemini reasons over that already-filtered evidence instead of the product only ever showing template sentences. See `docs/AI_USAGE.md`. |
 | Dataset scope | 26 real programs across 5 fields (Computer Science, Business, Engineering, Natural Sciences, Humanities) at 9 universities in the USA, Kazakhstan, and China | Broad enough to demonstrate genuine cross-field, cross-country personalization without the scope of a full catalog. Medicine and Arts have no credible data for these institutions and are reported as a gap rather than filled with placeholders — see `docs/DATA_AND_TRUST.md`. |
 
 ## 4. Architecture overview
@@ -70,6 +70,12 @@ Every fact carries a verification status (`verified` / `needs_verification` / `d
 
 Hard filters (field, country, budget ceiling) remove programs that can't work at all; six weighted factors (academic fit, interest fit, budget fit, requirement readiness, location fit, preference fit — weights documented in `src/lib/engine/weights.ts`, summing to 1.0) score everything that survives; explanation text is generated strictly from those computed numbers. **The fit score is a preference-match score, never an admission probability** — enforced in UI copy and covered by tests. Full specification and worked example: `docs/RECOMMENDATION_ENGINE.md`.
 
+This same pipeline now doubles as the AI advisor's retriever (`src/lib/ai/retrieval.ts`) — the deterministic engine decides which programs are eligible and produces the fit score/factor evidence; Gemini reasons over that evidence rather than deciding eligibility itself. See §7.1 and `docs/AI_USAGE.md`.
+
+### 7.1 The AI advisor
+
+A second, deeper AI feature beyond the copy-polish layer (§ below): `POST /api/advisor` sends the student's full profile — including a free-text field the structured form can't otherwise capture (projects, competitions, research, leadership, goals) — plus a capped, relevant slice of the university database (never the whole dataset) to Gemini, which returns a structured, multi-section personalized analysis (strengths, development areas, per-university analysis, recommended actions, open questions, things to verify). Citations are constrained by the Gemini response schema to only the program ids actually retrieved, then sanitized again server-side before display, so the model can't invent a database source. On any failure, the UI shows a real error with a retry option — there is deliberately no template fallback for this feature, since a personalized multi-section analysis has no safe deterministic equivalent to fall back to. Full pipeline, prompt design, and anti-hallucination measures: `docs/AI_USAGE.md`.
+
 ### What-If mode
 On the Recommendations page, changing the budget or toggling a country updates a local scenario, immediately re-runs the recommendation engine, and shows a "Your path changed" indicator. This demonstrates that matches are computed per-student rather than static.
 
@@ -83,11 +89,14 @@ Two real defects were found through browser-driven testing (Playwright), not jus
 ## 9. Verification performed
 
 - `tsc --noEmit` and `eslint` — clean.
-- `npm test` (Vitest) — 32 tests across scoring, hard filters, ranking, diagnosis, and roadmap generation.
-- The full user journey driven end-to-end in headless Chromium: landing → sample profile → diagnosis → recommendations → what-if change → comparison → roadmap → saved programs. Zero console errors, including at a 375px mobile viewport.
-- The AI fallback path (no API key configured) verified live in a browser: correct text displays instantly with no errors.
+- `npm test` (Vitest) — 62 tests: the original 32 across scoring, hard filters, ranking, diagnosis, and roadmap generation, plus 30 new ones covering the AI advisor's retrieval layer (ranking, zero-match, exclusion-capping, no matched/excluded overlap), request/response schema validation (valid and malformed profiles, requests, and model responses), and the advisor's error handling (missing key, malformed/empty Gemini responses, HTTP status classification, hallucinated-citation sanitization) via a mocked Gemini client — no real network calls in the test suite.
+- The full user journey driven end-to-end in headless Chromium: landing → sample profile → diagnosis → recommendations → what-if change → comparison → roadmap → saved programs. Zero console errors, including at a 375px mobile viewport. (This was the original build's verification pass — not re-run for the AI-advisor upgrade; see the next bullet for what was.)
+- `npm run build` succeeds with both `/api/explain` and `/api/advisor` correctly built as dynamic server routes.
+- The AI advisor's request pipeline verified live against a running dev server, both without and with a real API key: unconfigured, a valid profile correctly returns `503 not_configured` without attempting a Gemini call, and a missing profile / invalid JSON body / invalid enum value all correctly return `400` with specific validation errors; server logs confirm retrieval/request logging fires and never includes the API key or raw student free text.
+- **With a real, provisioned `GOOGLE_AI_API_KEY`**: a live end-to-end call succeeded, returning a grounded, personalized, correctly-cited structured analysis (see `docs/AI_USAGE.md` for the full response and the two real bugs this live test caught and fixed — an env-var fallback bug and a stale default model name).
+- The AI rephrasing fallback path (no API key configured) verified live in a browser in the original build: correct text displays instantly with no errors.
 
-**Not yet verified**: the live Claude API call itself (requires a provisioned key), a formal accessibility audit, and a production deployment.
+**Not yet verified**: the live Gemini rephrasing call path specifically (the advisor path is now verified; rephrasing shares the same client but hasn't been separately exercised with a key), a full browser click-through of the new profile free-text step and AdvisorPanel UI (verified structurally via build/tests/live HTTP checks, not via an interactive browser session), a formal accessibility audit, and a production deployment.
 
 ## 10. Summary
 
@@ -103,12 +112,15 @@ Pathlight turns a student's field, country, budget, and constraints into a ranke
 - A guided sample-profile entry point for fast evaluation.
 - Custom claymorphism design system.
 - Mobile-responsive down to 375px.
-- AI explanation layer (Claude API) with a verified fallback to deterministic copy.
+- A retrieval-grounded AI advisor (Google Gemini API) — structured, personalized, per-student analysis, with schema-constrained and server-sanitized citations, and a real (non-disguised) error state on failure. **Live-verified against a real key on 2026-09-17** — see `docs/AI_USAGE.md`.
+- AI explanation layer (Google Gemini API) with a verified fallback to deterministic copy.
 - Saved programs with a dedicated view and filter.
+- Request/response schema validation (Zod) at the AI advisor's server boundary.
 
 **Not yet built:**
-- Live verification of the Claude API call path (fallback path is what has been exercised).
+- AI advisor conversation history persisted across page reloads (currently in-memory only).
 - Medicine and Arts program data (no credible sources found for the current university set).
 - A hosted database / accounts (local persistence only, by design).
 - Production deployment.
 - A formal accessibility audit.
+- Rate limiting on either AI endpoint.

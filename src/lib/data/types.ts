@@ -97,4 +97,13 @@ export interface StudentProfile {
     prioritizeScholarship?: boolean;
     campusSize?: University["size"];
   };
+  /**
+   * Free-text room for anything the structured fields above don't capture —
+   * projects, competitions, research, leadership, awards, volunteering, career
+   * goals, concerns. Optional, unbounded in content (length-capped at the API
+   * boundary — see src/lib/ai/advisor-schema.ts), and never parsed by the
+   * deterministic engine; it only reaches the AI advisor (src/lib/ai/advisor.ts),
+   * which is the one consumer able to reason over free-form evidence.
+   */
+  additionalContext?: string;
 }

@@ -7,6 +7,7 @@ import { ClayCard } from "@/components/clay/ClayCard";
 import { ClayChip } from "@/components/clay/ClayChip";
 import { ClayInput } from "@/components/clay/ClayInput";
 import { RecommendationCard } from "@/components/recommendations/RecommendationCard";
+import { AdvisorPanel } from "@/components/advisor/AdvisorPanel";
 import { RequireProfile } from "@/components/layout/RequireProfile";
 import { useProfile } from "@/lib/store/profile-context";
 import { useSavedPrograms } from "@/lib/store/saved-programs";
@@ -88,6 +89,10 @@ function RecommendationsBody({ profile }: { profile: StudentProfile }) {
           </p>
         )}
       </ClayCard>
+
+      <div className="mt-6">
+        <AdvisorPanel profile={scenario} />
+      </div>
 
       <div className="mt-6 flex items-center justify-between">
         <h2 className="text-sm font-medium text-ink-faint">

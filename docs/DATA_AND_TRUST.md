@@ -45,7 +45,7 @@ No credible undergraduate Medicine or Arts program data was found for any of the
 
 1. Prefer the official university admissions/finance page as the source. Record the exact URL, not the homepage.
 2. If you can't find a specific figure on an official page, either mark it `needs_verification` (secondary source) or `demo_data` (no source, estimated) — never `verified`.
-3. Never let an AI-generated or freely-invented number enter this file. The dataset is the one place in the app where "no LLM invents facts" has to be absolutely true, since everything downstream (the recommendation engine, the AI rephrasing layer) treats it as ground truth.
+3. Never let an AI-generated or freely-invented number enter this file. The dataset is the one place in the app where "no LLM invents facts" has to be absolutely true, since everything downstream (the recommendation engine, and now the AI advisor's retrieval-grounded reasoning — see `docs/AI_USAGE.md`) treats it as ground truth.
 4. Re-verify anything older than a year before a real (non-demo) launch — deadlines and tuition change annually.
 
 ## Why the fit score is not an admission probability

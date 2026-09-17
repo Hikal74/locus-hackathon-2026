@@ -13,10 +13,11 @@ function isStringArray(value: unknown): value is string[] {
 }
 
 /**
- * Rephrases already-computed recommendation copy via Claude. The client always
- * sends the deterministic template text as input; on any failure this returns
- * that same text back with source: "template" so the UI never breaks. See
- * docs/AI_USAGE.md.
+ * Rephrases already-computed recommendation copy via Gemini. The client always
+ * sends the deterministic template text as input; on any failure (missing key,
+ * invalid key, rate limit, malformed response, network error — never by falling
+ * back to a different AI provider) this returns that same text back with
+ * source: "template" so the UI never breaks. See docs/AI_USAGE.md.
  */
 export async function POST(request: NextRequest) {
   let body: ExplainRequestBody;
@@ -36,11 +37,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "universityName, programName must be strings; whyItFits, watchOut must be string arrays" }, { status: 400 });
   }
 
-  const rephrased = await rephraseExplanation({ universityName, programName, whyItFits, watchOut });
+  const result = await rephraseExplanation({ universityName, programName, whyItFits, watchOut });
 
-  if (!rephrased) {
+  if (!result.ok) {
+    if (result.reason !== "not_configured") {
+      console.error(`[gemini] rephraseExplanation failed: ${result.reason}`);
+    }
     return NextResponse.json({ whyItFits, watchOut, source: "template" });
   }
 
-  return NextResponse.json({ whyItFits: rephrased.whyItFits, watchOut: rephrased.watchOut, source: "ai" });
+  return NextResponse.json({ whyItFits: result.data.whyItFits, watchOut: result.data.watchOut, source: "ai" });
 }

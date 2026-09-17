@@ -77,7 +77,7 @@ export function RecommendationCard({ recommendation, selected, onToggleSelect }:
             </div>
             {result?.source === "ai" && (
               <ClayBadge tone="neutral" className="mt-2">
-                Phrasing enhanced by Claude — facts unchanged
+                Phrasing enhanced by Gemini — facts unchanged
               </ClayBadge>
             )}
             {loading && <p className="mt-2 text-xs text-ink-faint">Polishing this explanation…</p>}
