@@ -10,11 +10,12 @@ Students choosing between universities across multiple countries face wildly dif
 
 ## The solution
 
-A structured, five-step questionnaire produces a profile. A deterministic scoring algorithm — not an LLM — filters and ranks real university programs against that profile, explains why each one fits, flags what to watch out for, and generates a single prioritized next action. Every factual claim (tuition, deadlines, requirements) is labeled with how confident the data actually is.
+A structured, six-step questionnaire produces a profile — including a free-text step for anything the structured fields don't capture (projects, competitions, research, leadership, goals). A deterministic scoring algorithm — not an LLM — filters and ranks real university programs against that profile, explains why each one fits, flags what to watch out for, and generates a single prioritized next action. On top of that, an AI advisor (Google Gemini) reasons across the full profile and a relevant slice of the same database to produce a genuinely personalized analysis, not a template. Every factual claim (tuition, deadlines, requirements) is labeled with how confident the data actually is.
 
 ## Key features
 
-- **Guided profile** — a progressive 5-step form instead of one long questionnaire.
+- **AI Advisor** — a retrieval-grounded Gemini advisor that reasons across your full profile (including free-text achievements/goals) and a relevant slice of the university database to produce a personalized analysis, not a template.
+- **Guided profile** — a progressive 6-step form instead of one long questionnaire, including a free-text step for anything the structured fields don't capture.
 - **Diagnosis** — strengths, constraints, and gaps read directly from the profile, plus a readiness view that is never framed as an admission probability.
 - **Ranked recommendations** — a transparent, six-factor scoring algorithm with a visible score breakdown on every result.
 - **What-If mode** — change budget or country preference and watch the shortlist and reasoning update live.
@@ -25,15 +26,20 @@ A structured, five-step questionnaire produces a profile. A deterministic scorin
 
 ## User journey
 
-Landing → Profile → Diagnosis → Recommendations → Comparison → Roadmap → Next Action → Progress.
+Landing → Profile → Diagnosis → Recommendations (+ AI Advisor) → Comparison → Roadmap → Next Action → Progress.
 
 ## Recommendation architecture
 
-No LLM decides which universities appear. A plain TypeScript pipeline (`src/lib/engine/`) hard-filters impossible options (wrong field, wrong country, tuition far beyond budget), then scores everything that survives across six weighted factors (academic fit, interest fit, budget fit, requirement readiness, location fit, preference fit), then ranks by the weighted result. Explanation text is generated only from those already-computed numbers. Full specification: [`docs/RECOMMENDATION_ENGINE.md`](docs/RECOMMENDATION_ENGINE.md).
+No LLM decides which universities appear. A plain TypeScript pipeline (`src/lib/engine/`) hard-filters impossible options (wrong field, wrong country, tuition far beyond budget), then scores everything that survives across six weighted factors (academic fit, interest fit, budget fit, requirement readiness, location fit, preference fit), then ranks by the weighted result. Explanation text is generated only from those already-computed numbers. This same pipeline doubles as the AI advisor's retriever — it decides eligibility, Gemini reasons over the result. Full specification: [`docs/RECOMMENDATION_ENGINE.md`](docs/RECOMMENDATION_ENGINE.md).
 
 ## AI usage
 
-Claude is used in exactly one place: rephrasing already-computed explanation text into warmer prose, constrained by a prompt that forbids adding new facts, with the deterministic template text as an automatic, verified fallback when no API key is configured or the call fails. AI never selects which universities appear. Full detail: [`docs/AI_USAGE.md`](docs/AI_USAGE.md).
+Two Gemini-powered features, both server-side, no other AI provider anywhere in the codebase:
+
+- **AI Advisor** (`/api/advisor`, surfaced on the Recommendations page) — a retrieval-grounded advisory pipeline. The deterministic engine still decides which universities are eligible; Gemini reasons across the student's full profile plus that already-filtered database evidence to produce a personalized, structured analysis. On failure, it shows a real error with a retry option — never the deterministic engine's output disguised as an AI answer.
+- **Explanation rephrasing** (`/api/explain`) — rephrases already-computed "why it fits" text into warmer prose, with the deterministic template text as an automatic, verified fallback when no API key is configured or the call fails.
+
+Neither feature ever silently retries against a different model or provider. AI never selects which universities are eligible to appear at all; that stays deterministic. Full detail: [`docs/AI_USAGE.md`](docs/AI_USAGE.md).
 
 ## Data sources and verification
 
@@ -41,7 +47,7 @@ Every tuition, deadline, requirement, and scholarship figure is labeled `verifie
 
 ## Tech stack
 
-Next.js 16 (App Router), TypeScript, Tailwind CSS v4, Vitest. Claude API (`@anthropic-ai/sdk`) for the optional explanation layer. No database — local persistence via `localStorage`, accessed through a `useSyncExternalStore`-based hook.
+Next.js 16 (App Router), TypeScript, Tailwind CSS v4, Vitest. Google Gemini API (`@google/genai`) for the AI advisor and explanation layers; Zod for request/response validation. No database — local persistence via `localStorage`, accessed through a `useSyncExternalStore`-based hook.
 
 ## Architecture
 
@@ -58,8 +64,8 @@ npm install
 Copy `.env.local.example` to `.env.local` and fill in real values. Both are optional — the app runs fully functional without them:
 
 ```
-ANTHROPIC_API_KEY=      # enables live AI rephrasing; falls back to templates if unset
-ANTHROPIC_MODEL=        # optional override, defaults to claude-opus-5
+GOOGLE_AI_API_KEY=      # enables live AI rephrasing; falls back to templates if unset
+GEMINI_MODEL=           # optional override, defaults to gemini-3.6-flash
 ```
 
 ## Local development
@@ -73,25 +79,26 @@ Open [http://localhost:3000](http://localhost:3000). On Windows, double-clicking
 ## Testing
 
 ```bash
-npm test       # Vitest — recommendation engine, diagnosis, and roadmap logic
+npm test       # Vitest — recommendation engine, diagnosis, roadmap, and AI advisor logic
 npm run lint   # ESLint
 ```
 
 ## Deployment
 
-Deployed via Vercel. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the data-flow model; no database or external service is required for a working deployment.
+Deployed via Vercel. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the data-flow model; no database or external service is required for a working deployment. `GOOGLE_AI_API_KEY` must be set in the deployment environment's variables for the AI features to run live (both fall back gracefully without it).
 
 ## Limitations
 
 - Dataset covers Computer Science, Business, Engineering, Natural Sciences, and Humanities across 9 universities in the USA, Kazakhstan, and China. No Medicine or Arts program data was found for these institutions.
 - No accounts or cross-device sync — state is per-browser (`localStorage`).
-- The live AI rephrasing path requires a provisioned Anthropic API key; only the deterministic fallback has been exercised in this build.
+- Both Gemini features (AI Advisor, explanation rephrasing) require a provisioned Google AI Studio (Gemini) API key; without one, the AI Advisor shows a clear "not configured" error and rephrasing falls back to deterministic template text.
+- AI Advisor follow-up conversation history is in-memory only and resets on page reload.
 
 ## Documentation
 
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — architecture and stack rationale
 - [`docs/RECOMMENDATION_ENGINE.md`](docs/RECOMMENDATION_ENGINE.md) — scoring algorithm specification
-- [`docs/AI_USAGE.md`](docs/AI_USAGE.md) — AI integration and fallback behavior
+- [`docs/AI_USAGE.md`](docs/AI_USAGE.md) — AI integration, the advisor pipeline, and fallback behavior
 - [`docs/DATA_AND_TRUST.md`](docs/DATA_AND_TRUST.md) — data verification model
 - [`docs/SECURITY.md`](docs/SECURITY.md) — secrets handling and data boundaries
 - [`docs/BUILDER_JOURNAL.md`](docs/BUILDER_JOURNAL.md) — engineering decision log
