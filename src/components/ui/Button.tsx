@@ -10,21 +10,21 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary: "bg-ink text-on-primary border-2 border-ink",
-  accent: "bg-paper text-ink border-[3px] border-ink",
-  secondary: "bg-paper text-ink border-2 border-ink",
-  ghost: "bg-transparent text-ink border-2 border-transparent shadow-none hover:border-line-soft",
+  primary: "bg-ink text-on-primary border border-ink hover:opacity-90",
+  accent: "bg-transparent text-ink border border-ink hover:bg-surface",
+  secondary: "bg-surface text-ink border border-line hover:bg-surface-raised",
+  ghost: "bg-transparent text-ink border border-transparent shadow-none hover:bg-surface",
 };
 
 const sizeClasses: Record<Size, string> = {
-  sm: "px-4 py-2 text-sm rounded-[var(--radius-sm)]",
-  md: "px-6 py-3 text-base rounded-[var(--radius-md)]",
-  lg: "px-8 py-4 text-lg rounded-[var(--radius-md)]",
+  sm: "px-4 py-2 text-sm rounded-[var(--radius-pill)]",
+  md: "px-6 py-2.5 text-base rounded-[var(--radius-pill)]",
+  lg: "px-8 py-3.5 text-lg rounded-[var(--radius-pill)]",
 };
 
 /**
- * Editorial/brutalist button: rests on a hard offset shadow, presses down
- * onto it. Depth is carried entirely by shadow + translate, not color.
+ * Flat pill button — no offset shadow, depth carried by a hairline border
+ * plus a subtle opacity/background shift on hover, pressed state included.
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = "primary", size = "md", className, children, ...props }, ref) => {
@@ -32,11 +32,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         className={cn(
-          "font-medium transition-[box-shadow,transform] duration-150 ease-out",
-          variant !== "ghost" && "shadow-[var(--shadow-raised)]",
-          variant !== "ghost" && "hover:shadow-[var(--shadow-raised-hover)] hover:-translate-x-px hover:-translate-y-px",
-          variant !== "ghost" &&
-            "active:shadow-[var(--shadow-pressed)] active:translate-x-[3px] active:translate-y-[3px]",
+          "font-semibold transition-[background-color,opacity,transform] duration-150 ease-out active:scale-[0.98]",
           "focus-visible:outline-none focus-visible:shadow-[var(--ring-focus)]",
           "disabled:opacity-40 disabled:pointer-events-none",
           variantClasses[variant],

@@ -27,9 +27,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           aria-describedby={cn(hintId, errorId) || undefined}
           aria-invalid={Boolean(error)}
           className={cn(
-            "bg-paper rounded-[var(--radius-sm)] px-4 py-3 text-ink placeholder:text-ink-faint",
-            "shadow-[var(--shadow-recessed)] outline-none border-2 border-ink",
-            "focus-visible:shadow-[var(--ring-focus)]",
+            "bg-surface rounded-[var(--radius-sm)] px-4 py-3 text-ink placeholder:text-ink-faint",
+            "outline-none border border-line",
+            "focus-visible:shadow-[var(--ring-focus)] focus-visible:border-ink",
             error && "outline-offset-2",
             className
           )}

@@ -57,7 +57,7 @@ export default function RankPage() {
                   }}
                   className="flex items-center gap-3"
                 >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-ink text-xs font-semibold">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line text-xs font-semibold">
                     {index + 1}
                   </span>
                   <GripIcon width={16} height={16} className="shrink-0 cursor-grab text-ink-faint" />

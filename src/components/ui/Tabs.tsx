@@ -15,7 +15,7 @@ interface TabsProps {
 /** Small controlled tab strip — no headless-UI dependency. */
 export function Tabs({ items, value, onChange, className }: TabsProps) {
   return (
-    <div role="tablist" className={cn("flex gap-1 border-b-2 border-ink", className)}>
+    <div role="tablist" className={cn("inline-flex gap-1 rounded-[var(--radius-pill)] bg-surface p-1", className)}>
       {items.map((item) => {
         const active = item.value === value;
         return (
@@ -26,8 +26,8 @@ export function Tabs({ items, value, onChange, className }: TabsProps) {
             aria-selected={active}
             onClick={() => onChange(item.value)}
             className={cn(
-              "px-4 py-2.5 text-sm font-medium -mb-[2px] border-b-2 transition-colors",
-              active ? "border-ink text-ink" : "border-transparent text-ink-faint hover:text-ink-soft"
+              "rounded-[var(--radius-pill)] px-4 py-2 text-sm font-medium transition-colors",
+              active ? "bg-ink text-on-primary" : "text-ink-faint hover:text-ink-soft"
             )}
           >
             {item.label}

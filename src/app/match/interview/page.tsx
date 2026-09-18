@@ -154,7 +154,7 @@ function InterviewChat({ profile }: { profile: StudentProfile }) {
             <div
               className={cn(
                 "max-w-[85%] rounded-[var(--radius-md)] px-3.5 py-2.5 text-sm",
-                t.role === "user" ? "bg-ink text-on-primary" : "border-2 border-ink bg-paper text-ink"
+                t.role === "user" ? "bg-ink text-on-primary" : "border border-line bg-surface text-ink"
               )}
             >
               {t.content}
@@ -175,7 +175,7 @@ function InterviewChat({ profile }: { profile: StudentProfile }) {
             }
           }}
           placeholder="Type your answer…"
-          className="flex-1 rounded-[var(--radius-sm)] border-2 border-ink bg-paper px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint outline-none shadow-[var(--shadow-recessed)] focus-visible:shadow-[var(--ring-focus)]"
+          className="flex-1 rounded-[var(--radius-sm)] border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint outline-none focus-visible:shadow-[var(--ring-focus)] focus-visible:border-ink"
         />
         <Button onClick={submit} disabled={loading || !draft.trim()}>
           Send

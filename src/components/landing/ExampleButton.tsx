@@ -19,7 +19,7 @@ export function ExampleButton() {
         router.push("/diagnosis");
       }}
     >
-      See an example
+      See how it works
     </Button>
   );
 }

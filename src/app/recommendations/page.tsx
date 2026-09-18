@@ -148,7 +148,7 @@ function RecommendationsBody({ profile }: { profile: StudentProfile }) {
         </p>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-paper/95 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-paper/95 backdrop-blur">
         <div className="mx-auto flex max-w-4xl justify-end gap-3 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] sm:px-6">
           <Button variant="secondary" disabled={selectedIds.length < 2} onClick={() => router.push(`/compare?ids=${selectedIds.join(",")}`)}>
             Compare selected ({selectedIds.length})

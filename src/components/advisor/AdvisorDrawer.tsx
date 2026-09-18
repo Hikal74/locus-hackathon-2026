@@ -53,7 +53,7 @@ function ChatTab() {
                   key={prompt}
                   type="button"
                   onClick={() => send(prompt)}
-                  className="rounded-[var(--radius-sm)] border-2 border-ink bg-paper px-3 py-2 text-left text-sm text-ink hover:bg-surface"
+                  className="rounded-[var(--radius-sm)] border border-line bg-surface px-3 py-2 text-left text-sm text-ink hover:bg-surface-raised"
                 >
                   {prompt}
                 </button>
@@ -68,7 +68,7 @@ function ChatTab() {
               <div
                 className={cn(
                   "max-w-[85%] rounded-[var(--radius-md)] px-3.5 py-2.5 text-sm whitespace-pre-wrap",
-                  m.role === "user" ? "bg-ink text-on-primary" : "border-2 border-ink bg-paper text-ink"
+                  m.role === "user" ? "bg-ink text-on-primary" : "border border-line bg-surface text-ink"
                 )}
               >
                 {m.content}
@@ -77,13 +77,13 @@ function ChatTab() {
           ))}
           {loading && (
             <div className="flex justify-start">
-              <div className="rounded-[var(--radius-md)] border-2 border-ink bg-paper px-3.5 py-2.5 text-sm text-ink-faint">
+              <div className="rounded-[var(--radius-md)] border border-line bg-surface px-3.5 py-2.5 text-sm text-ink-faint">
                 Thinking…
               </div>
             </div>
           )}
           {status === "error" && (
-            <div className="flex flex-col gap-2 rounded-[var(--radius-md)] border-2 border-ink bg-surface p-3">
+            <div className="flex flex-col gap-2 rounded-[var(--radius-md)] border border-line bg-surface p-3">
               <p className="flex items-start gap-2 text-sm text-ink">
                 <WarningIcon width={16} height={16} className="mt-0.5 shrink-0" />
                 {errorMessage ?? "Something went wrong."}
@@ -102,7 +102,7 @@ function ChatTab() {
         )}
       </div>
 
-      <div className="flex items-end gap-2 border-t-2 border-ink px-4 py-3 sm:px-5">
+      <div className="flex items-end gap-2 border-t border-line px-4 py-3 sm:px-5">
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -114,7 +114,7 @@ function ChatTab() {
           }}
           placeholder="Ask the advisor…"
           rows={1}
-          className="max-h-28 flex-1 resize-none rounded-[var(--radius-sm)] border-2 border-ink bg-paper px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint outline-none shadow-[var(--shadow-recessed)] focus-visible:shadow-[var(--ring-focus)]"
+          className="max-h-28 flex-1 resize-none rounded-[var(--radius-sm)] border border-line bg-surface px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint outline-none focus-visible:shadow-[var(--ring-focus)] focus-visible:border-ink"
         />
         <Button onClick={submit} disabled={loading || !draft.trim()} aria-label="Send" size="sm" className="shrink-0">
           <SendIcon width={16} height={16} />

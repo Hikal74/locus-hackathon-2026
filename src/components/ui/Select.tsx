@@ -30,9 +30,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             id={selectId}
             aria-describedby={hintId}
             className={cn(
-              "w-full bg-paper rounded-[var(--radius-sm)] pl-4 pr-10 py-3 text-ink appearance-none",
-              "shadow-[var(--shadow-recessed)] outline-none border-2 border-ink",
-              "focus-visible:shadow-[var(--ring-focus)]",
+              "w-full bg-surface rounded-[var(--radius-sm)] pl-4 pr-10 py-3 text-ink appearance-none",
+              "outline-none border border-line",
+              "focus-visible:shadow-[var(--ring-focus)] focus-visible:border-ink",
               className
             )}
             {...props}

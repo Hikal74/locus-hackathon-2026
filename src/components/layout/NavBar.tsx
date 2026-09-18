@@ -3,47 +3,57 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
-import { useProfile } from "@/lib/store/profile-context";
+import { Button } from "@/components/ui/Button";
 
 const STEPS = [
-  { href: "/profile", label: "Profile" },
-  { href: "/diagnosis", label: "Diagnosis" },
-  { href: "/match", label: "Match" },
-  { href: "/recommendations", label: "Recommendations" },
+  { href: "/", label: "Home" },
+  { href: "/my-plan", label: "My Plan" },
+  { href: "/universities", label: "Universities" },
   { href: "/compare", label: "Compare" },
   { href: "/roadmap", label: "Roadmap" },
-  { href: "/saved", label: "Saved" },
 ];
 
 export function NavBar() {
   const pathname = usePathname();
-  const { profile } = useProfile();
 
   return (
-    <header className="sticky top-[env(safe-area-inset-top,0px)] z-30 border-b-2 border-ink bg-paper/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
-        <Link href="/" className="text-lg font-semibold tracking-tight text-ink">
+    <header className="sticky top-[calc(env(safe-area-inset-top,0px)+12px)] z-30 px-4 sm:px-6">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 rounded-[var(--radius-pill)] border border-line bg-surface/90 px-4 py-2.5 shadow-[0_8px_24px_rgba(0,0,0,0.5)] backdrop-blur">
+        <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight text-ink">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full border border-line text-xs">◆</span>
           Pathlight
         </Link>
-        {profile && (
-          <nav className="flex w-full flex-nowrap items-center gap-1 overflow-x-auto text-sm sm:w-auto sm:ml-auto">
-            {STEPS.map((step) => {
-              const active = pathname === step.href || (step.href !== "/" && pathname.startsWith(`${step.href}/`));
-              return (
-                <Link
-                  key={step.href}
-                  href={step.href}
-                  className={cn(
-                    "shrink-0 rounded-[var(--radius-pill)] px-3 py-1.5 border-2 transition-colors",
-                    active ? "border-ink bg-ink text-on-primary" : "border-transparent text-ink-soft hover:border-ink"
-                  )}
-                >
-                  {step.label}
-                </Link>
-              );
-            })}
-          </nav>
-        )}
+
+        <nav className="flex flex-nowrap items-center gap-1 overflow-x-auto text-sm">
+          {STEPS.map((step) => {
+            const active = pathname === step.href || (step.href !== "/" && pathname.startsWith(`${step.href}/`));
+            return (
+              <Link
+                key={step.href}
+                href={step.href}
+                className={cn(
+                  "shrink-0 rounded-[var(--radius-pill)] px-3.5 py-1.5 transition-colors",
+                  active ? "bg-ink text-on-primary" : "text-ink-soft hover:text-ink"
+                )}
+              >
+                {step.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="ml-auto flex shrink-0 items-center gap-2">
+          <Link href="/login">
+            <Button variant="secondary" size="sm">
+              Log in
+            </Button>
+          </Link>
+          <Link href="/signup">
+            <Button variant="primary" size="sm">
+              Sign up
+            </Button>
+          </Link>
+        </div>
       </div>
     </header>
   );

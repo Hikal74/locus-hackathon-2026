@@ -12,15 +12,15 @@ const paddingClasses = {
   lg: "p-8",
 };
 
-/** Bordered paper surface on a hard offset shadow. Set `interactive` for click targets. */
+/** Flat surface on a hairline border. Set `interactive` for click targets. */
 export function Card({ padding = "md", interactive = false, className, children, ...props }: CardProps) {
   return (
     <div
       className={cn(
-        "bg-paper border-2 border-ink rounded-[var(--radius-lg)] shadow-[var(--shadow-raised)]",
+        "bg-surface border border-line-soft rounded-[var(--radius-lg)]",
         paddingClasses[padding],
         interactive &&
-          "cursor-pointer transition-[box-shadow,transform] duration-150 hover:shadow-[var(--shadow-raised-hover)] hover:-translate-x-px hover:-translate-y-px active:shadow-[var(--shadow-pressed)] active:translate-x-[3px] active:translate-y-[3px]",
+          "cursor-pointer transition-[background-color,border-color] duration-150 hover:bg-surface-raised hover:border-line active:opacity-90",
         className
       )}
       {...props}

@@ -27,11 +27,11 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(
           id={inputId}
           type="range"
           className={cn(
-            "w-full appearance-none h-2 rounded-[var(--radius-pill)] bg-surface border border-ink cursor-pointer",
+            "w-full appearance-none h-1.5 rounded-[var(--radius-pill)] bg-surface-raised border border-line cursor-pointer",
             "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4",
-            "[&::-webkit-slider-thumb]:bg-ink [&::-webkit-slider-thumb]:rounded-[3px] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-ink",
-            "[&::-webkit-slider-thumb]:shadow-[var(--shadow-raised)] [&::-webkit-slider-thumb]:cursor-pointer",
-            "[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-ink [&::-moz-range-thumb]:rounded-[3px] [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-ink [&::-moz-range-thumb]:cursor-pointer",
+            "[&::-webkit-slider-thumb]:bg-ink [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-ink",
+            "[&::-webkit-slider-thumb]:cursor-pointer",
+            "[&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:bg-ink [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-ink [&::-moz-range-thumb]:cursor-pointer",
             "focus-visible:outline-none focus-visible:shadow-[var(--ring-focus)]",
             className
           )}
