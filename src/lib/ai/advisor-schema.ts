@@ -33,11 +33,33 @@ const FieldOfStudySchema = z.enum([
 
 const CountrySchema = z.enum(["USA", "Kazakhstan", "China"]);
 
+const LanguageSchema = z.enum(["English", "Chinese", "Kazakh", "Russian"]);
+
+const CurriculumTypeSchema = z.enum(["IB", "AP", "A-Levels", "National", "Other"]);
+
 export const StudentProfileRequestSchema = z.object({
+  // Level 1 — Quick Demographics
   age: z.number().min(10).max(100).optional(),
   grade: z.string().max(100).optional(),
+  nativeLanguage: z.string().max(100).optional(),
+  languageOfInstruction: LanguageSchema.optional(),
+
+  // Level 2 — Preferences & Aspirations
   intendedField: FieldOfStudySchema,
   interests: z.array(z.string().max(100)).max(30),
+  countryPreferences: z.array(CountrySchema).max(10),
+
+  // Level 3 — Career Goals & Field Requirements
+  careerPath: z.string().max(200).optional(),
+  fieldWants: z.array(z.string().max(100)).max(15),
+
+  // Level 4 — Metrics, Exams & Logistics
+  // No upper cap: the What-If budget input (src/app/recommendations/page.tsx)
+  // has none either, and an unusually large budget isn't invalid input the
+  // way a huge free-text blob is — just require it be a real, non-negative
+  // number (rules out NaN/Infinity from a malformed client-side computation).
+  budgetPerYearUSD: z.number().min(0).finite(),
+  intendedIntake: z.string().max(100),
   // Clamped, not rejected: the profile form labels this "4.0 scale," but
   // nothing before this schema enforced that (an HTML `max` attribute alone
   // doesn't stop a typed value from exceeding it), and this dataset's own
@@ -51,19 +73,16 @@ export const StudentProfileRequestSchema = z.object({
     .finite()
     .transform((v) => Math.min(4, Math.max(0, v)))
     .optional(),
-  relevantSubjects: z.array(z.string().max(100)).max(30),
-  countryPreferences: z.array(CountrySchema).max(10),
-  // No upper cap: the What-If budget input (src/app/recommendations/page.tsx)
-  // has none either, and an unusually large budget isn't invalid input the
-  // way a huge free-text blob is — just require it be a real, non-negative
-  // number (rules out NaN/Infinity from a malformed client-side computation).
-  budgetPerYearUSD: z.number().min(0).finite(),
+  curriculumType: CurriculumTypeSchema.optional(),
+  standardizedExamsCompleted: z.array(z.string().max(100)).max(30),
+  languageExamsCompleted: z.array(z.string().max(100)).max(30),
   // Partial<Record<Language, string>> on the StudentProfile type — keys aren't
   // strictly enum-checked here since `z.record` over an enum requires every
   // key present, which would reject valid partial data (e.g. English only).
   languageLevel: z.record(z.string().max(20), z.string().max(100)),
-  examsCompleted: z.array(z.string().max(100)).max(30),
-  intendedIntake: z.string().max(100),
+  citizenshipAndVisa: z.string().max(500).optional(),
+
+  relevantSubjects: z.array(z.string().max(100)).max(30),
   preferences: z.object({
     prioritizeResearch: z.boolean().optional(),
     prioritizeScholarship: z.boolean().optional(),

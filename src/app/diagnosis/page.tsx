@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Progress } from "@/components/ui/Progress";
 import { WarningIcon } from "@/components/ui/icons";
 import { RequireProfile } from "@/components/layout/RequireProfile";
 import { buildDiagnosis } from "@/lib/engine/diagnosis";
@@ -52,21 +51,9 @@ export default function DiagnosisPage() {
               </Card>
             )}
 
-            <Card padding="md" className="mt-6">
-              <h2 className="font-semibold text-ink">Readiness</h2>
-              <p className="mt-1 text-xs text-ink-faint">
-                This reflects how much of your profile is filled in — not an admission probability.
-              </p>
-              <div className="mt-4 flex flex-col gap-4">
-                {diagnosis.readiness.map((r) => (
-                  <Progress key={r.label} label={r.label} value={r.value} />
-                ))}
-              </div>
-            </Card>
-
             <div className="mt-8 flex justify-end">
-              <Link href="/match">
-                <Button size="lg">Choose how to find my matches</Button>
+              <Link href="/universities">
+                <Button size="lg">See my university matches</Button>
               </Link>
             </div>
           </div>

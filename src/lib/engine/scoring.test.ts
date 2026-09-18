@@ -66,7 +66,7 @@ describe("requirementsFit", () => {
     expect(gaps).toHaveLength(0);
   });
   it("reports a gap for each unmet requirement", () => {
-    const { score, gaps } = requirementsFit({ ...testProfile, languageLevel: {}, examsCompleted: [] }, testProgram);
+    const { score, gaps } = requirementsFit({ ...testProfile, languageLevel: {}, standardizedExamsCompleted: [] }, testProgram);
     expect(score).toBeLessThan(100);
     expect(gaps).toHaveLength(2);
   });

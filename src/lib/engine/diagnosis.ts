@@ -6,8 +6,6 @@ export interface Diagnosis {
   strengths: string[];
   constraints: string[];
   gaps: string[];
-  readiness: { label: string; value: number }[];
-  overallReadiness: number;
 }
 
 /**
@@ -37,8 +35,9 @@ export function buildDiagnosis(profile: StudentProfile): Diagnosis {
     gaps.push("No language proficiency confirmed yet — this affects every program in the dataset.");
   }
 
-  if (profile.examsCompleted.length > 0) {
-    strengths.push(`Already completed: ${profile.examsCompleted.join(", ")}.`);
+  const examsCompleted = [...profile.standardizedExamsCompleted, ...profile.languageExamsCompleted];
+  if (examsCompleted.length > 0) {
+    strengths.push(`Already completed: ${examsCompleted.join(", ")}.`);
   } else {
     constraints.push("No standardized tests completed yet — several programs require SAT, UNT, or HSK scores.");
   }
@@ -53,16 +52,9 @@ export function buildDiagnosis(profile: StudentProfile): Diagnosis {
     constraints.push(`Only considering ${profile.countryPreferences[0]} narrows the shortlist significantly — adding a second country would open more options.`);
   }
 
-  const readiness = [
-    { label: "Academic info provided", value: profile.gpaOn4Scale != null ? 100 : 20 },
-    { label: "Language proficiency confirmed", value: languages.length > 0 ? 100 : 20 },
-    { label: "Exams completed", value: profile.examsCompleted.length > 0 ? Math.min(100, profile.examsCompleted.length * 50) : 10 },
-  ];
-  const overallReadiness = Math.round(readiness.reduce((sum, r) => sum + r.value, 0) / readiness.length);
-
   const goal = `${FIELD_LABELS[profile.intendedField]} at the bachelor's level, starting ${profile.intendedIntake}, in ${profile.countryPreferences.join(
     " or "
   )}${profile.budgetPerYearUSD ? `, within about $${profile.budgetPerYearUSD.toLocaleString()}/year` : ""}.`;
 
-  return { goal, strengths, constraints, gaps, readiness, overallReadiness };
+  return { goal, strengths, constraints, gaps };
 }

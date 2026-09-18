@@ -24,14 +24,6 @@ describe("buildDiagnosis", () => {
     expect(diagnosis.constraints.some((c) => /narrows/i.test(c))).toBe(true);
   });
 
-  it("computes overall readiness as the average of its three components", () => {
-    const diagnosis = buildDiagnosis(testProfile);
-    const expectedAverage = Math.round(
-      diagnosis.readiness.reduce((sum, r) => sum + r.value, 0) / diagnosis.readiness.length
-    );
-    expect(diagnosis.overallReadiness).toBe(expectedAverage);
-  });
-
   it("never frames readiness as an admission probability in the goal sentence", () => {
     const diagnosis = buildDiagnosis(testProfile);
     expect(diagnosis.goal).not.toMatch(/chance|probability|admit/i);

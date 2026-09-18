@@ -24,8 +24,8 @@ function SavedBody({ profile }: { profile: StudentProfile }) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <p className="text-ink-soft">You haven&apos;t saved any programs yet.</p>
-        <Link href="/recommendations" className="mt-4 inline-block">
-          <Chip>Browse recommendations</Chip>
+        <Link href="/universities" className="mt-4 inline-block">
+          <Chip>Browse university matches</Chip>
         </Link>
       </div>
     );

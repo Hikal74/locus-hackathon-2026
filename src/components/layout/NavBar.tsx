@@ -3,11 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
-import { Button } from "@/components/ui/Button";
 
 const STEPS = [
   { href: "/", label: "Home" },
-  { href: "/my-plan", label: "My Plan" },
   { href: "/universities", label: "Universities" },
   { href: "/compare", label: "Compare" },
   { href: "/roadmap", label: "Roadmap" },
@@ -24,7 +22,7 @@ export function NavBar() {
           Pathlight
         </Link>
 
-        <nav className="flex flex-nowrap items-center gap-1 overflow-x-auto text-sm">
+        <nav className="flex flex-nowrap items-center gap-1 overflow-x-auto text-sm sm:ml-auto">
           {STEPS.map((step) => {
             const active = pathname === step.href || (step.href !== "/" && pathname.startsWith(`${step.href}/`));
             return (
@@ -41,19 +39,6 @@ export function NavBar() {
             );
           })}
         </nav>
-
-        <div className="ml-auto flex shrink-0 items-center gap-2">
-          <Link href="/login">
-            <Button variant="secondary" size="sm">
-              Log in
-            </Button>
-          </Link>
-          <Link href="/signup">
-            <Button variant="primary" size="sm">
-              Sign up
-            </Button>
-          </Link>
-        </div>
       </div>
     </header>
   );

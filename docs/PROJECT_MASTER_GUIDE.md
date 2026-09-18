@@ -22,10 +22,9 @@ A secondary-school student who knows roughly what they want to study but is over
 | Decision | Choice | Rationale |
 |---|---|---|
 | Data backend | Local persistence (`localStorage`) rather than a database | Removes an external dependency for demo reliability; the data-access layer (`src/lib/data/dataset.ts`) is isolated so a real database can be substituted without touching the pages that consume it. |
-| AI integration | Google Gemini API (single provider, no secondary AI fallback), used four ways: a retrieval-grounded structured advisor, a global freeform chat advisor reachable from every page, a conversation-to-priority-order extraction for the Interview match method, and a smaller copy-polish layer with a deterministic template fallback | No LLM decides which universities are *eligible*, ever — that stays deterministic (see §7). Gemini reasons over already-filtered evidence, or extracts a stated preference, instead of the product either showing template sentences or letting a model invent eligibility. See `docs/AI_USAGE.md`. |
-| Matching personalization | Four selectable methods (Duels, Rank, Fit Map, Interview) that each produce a personalized weight vector over the same six fit factors, instead of one fixed global weight table | A student who explicitly cares most about cost now gets a shortlist that reflects that, not the same fixed 0.20 budget weight as everyone else — while keeping the underlying scoring deterministic and auditable. See `docs/RECOMMENDATION_ENGINE.md` §2.5. |
+| AI integration | Google Gemini API (single provider, no secondary AI fallback), used three ways: a retrieval-grounded structured advisor, a global freeform chat advisor reachable from every page, and a smaller copy-polish layer with a deterministic template fallback | No LLM decides which universities are *eligible*, ever — that stays deterministic (see §7). Gemini reasons over already-filtered evidence instead of the product either showing template sentences or letting a model invent eligibility. See `docs/AI_USAGE.md`. |
 | Visual design | Strict black/white/grayscale ("true monochrome") — status and hierarchy carried by weight, border pattern, and icon, never hue | Reads as a considered, editorial product rather than a generic AI-gradient demo; also the most defensible, judge-legible way to guarantee accessibility-by-construction (no color-only meaning anywhere). |
-| Dataset scope | 26 real programs across 5 fields (Computer Science, Business, Engineering, Natural Sciences, Humanities) at 9 universities in the USA, Kazakhstan, and China | Broad enough to demonstrate genuine cross-field, cross-country personalization without the scope of a full catalog. Medicine and Arts have no credible data for these institutions and are reported as a gap rather than filled with placeholders — see `docs/DATA_AND_TRUST.md`. |
+| Dataset scope | 33 real programs across 6 fields (Computer Science, Business, Engineering, Natural Sciences, Humanities, Arts) at 9 universities in the USA, Kazakhstan, and China | Broad enough to demonstrate genuine cross-field, cross-country personalization without the scope of a full catalog. Medicine has no credible data for these institutions and is reported as a gap rather than filled with placeholders — see `docs/DATA_AND_TRUST.md`. |
 
 ## 4. Architecture overview
 
@@ -36,14 +35,13 @@ Next.js 16 (App Router) + TypeScript + Tailwind v4
                     |
         localStorage (via useSyncExternalStore)
                     |
-   ┌────────────────┼──────────────────┬───────────────────┐
-   |                |                  |                   |
-Structured data   Deterministic    Personalized        UI (true-
-(dataset.ts)       engine          weight vector       monochrome
-                 (hard filters →   (4 /match methods,   design system,
-                  weighted scoring  see §7.2) — read     src/components/ui)
-                  → explanation)    by every page that
-                                    calls the engine
+   ┌────────────────┼──────────────────┐
+   |                |                  |
+Structured data   Deterministic     UI (true-
+(dataset.ts)       engine           monochrome
+                 (hard filters →    design system,
+                  weighted scoring  src/components/ui)
+                  → explanation)
 ```
 
 **No LLM sits between the student and a recommendation.** The entire matching pipeline — filtering, scoring, ranking, "why it fits" text — is plain TypeScript over structured data, whether the weights are the default table or one of the four personalized vectors from §7.2. AI sits on top only as a reasoning/copy layer (see §7.3 and `docs/AI_USAGE.md`), never as the source of which universities appear or how they're weighted.
@@ -75,9 +73,9 @@ Hard filters (field, country, budget ceiling) remove programs that can't work at
 
 This same pipeline doubles as both AI features' retriever (`src/lib/ai/retrieval.ts`) — the deterministic engine decides which programs are eligible and produces the fit score/factor evidence; Gemini reasons over that evidence rather than deciding eligibility itself. See §7.3 and `docs/AI_USAGE.md`.
 
-### 7.2 Personalized matching — four methods, one weight vector
+### 7.2 Weights
 
-Rather than one fixed global weight table, a student picks one of four methods on `/match` — **Duels** (head-to-head program picks), **Rank** (drag-order the six factors), **Fit Map** (direct-manipulation sliders over a live SVG scatter plot), or **Interview** (a short AI-guided conversation, with a static-quiz fallback if the AI is unavailable) — each of which produces a personalized `Record<FactorKey, number>` fed into `getRecommendations`' optional weights argument. All four converge through the same `normalizeWeights()` invariant (clamped, smoothed, summing to 1) that `FIT_WEIGHTS` already holds. The result (`{ weights, method }`) is persisted and read by every page that calls the engine, so fit scores stay consistent across Recommendations, Compare, Roadmap, and Saved. Full detail: `docs/RECOMMENDATION_ENGINE.md` §2.5.
+`getRecommendations` takes an optional weights argument, currently always the balanced `FIT_WEIGHTS` default. **Removed:** an earlier build let a student personalize this vector via one of four methods (Duels, Rank, Fit Map, AI Interview) on a `/match` picker; that subsystem was removed to simplify the flow. `useMatchWeights` (`src/lib/store/match-weights.ts`) is kept as the one place Recommendations/Compare/Roadmap/Saved read weights from, in case a personalized method is reintroduced later. See `docs/RECOMMENDATION_ENGINE.md` §2.5 and `docs/BUILDER_JOURNAL.md`.
 
 ### 7.3 The AI advisor — structured analysis and global chat
 
@@ -115,25 +113,23 @@ Pathlight turns a student's field, country, budget, and constraints into a ranke
 ## 11. Status
 
 **Built and verified:**
-- Full journey: Landing → Profile → Diagnosis → Match (method picker) → [Duels | Rank | Fit Map | Interview] → Recommendations → Comparison → Roadmap (a branching metro-map diagram, not a flat checklist) → Saved programs.
-- Deterministic recommendation engine with documented default weights, hard constraints, an optional personalized weight vector, and an automated test suite.
-- Four selectable matching methods, each producing a personalized weight vector fed into the same engine — see `docs/RECOMMENDATION_ENGINE.md` §2.5.
-- A branching metro-map roadmap: 4 parallel, deterministic tracks (Academic Prep, Portfolio & Achievements, Documents & Funding, Applications & Essays) converging on a "Dream Portfolio" terminus — hand-rolled SVG, lines distinguished by stroke pattern not color, click-to-expand stations, no AI involved in deciding what's on it.
+- Full journey: Landing → Profile (12-step, 4-level onboarding) → Diagnosis → Recommendations → Comparison → Roadmap (a branching metro-map diagram, not a flat checklist) → Saved programs.
+- Deterministic recommendation engine with documented default weights, hard constraints, and an automated test suite. (An earlier build let a student personalize the weight vector via 4 selectable methods on a `/match` picker; that subsystem was removed to simplify the flow — every profile now uses the balanced default weights. See `docs/BUILDER_JOURNAL.md`.)
+- A branching metro-map roadmap: 4 parallel, deterministic tracks (Academic Prep, Portfolio & Achievements, Documents & Funding, Applications & Essays) converging on a "Dream Portfolio" terminus — hand-rolled SVG, lines distinguished by stroke pattern not color, click-to-expand stations, no AI involved in deciding what's on it. Portfolio-line guidance is personalized deterministically from the student's stated interests, career path, and program wants.
 - A global AI advisor drawer, reachable from every page, with a freeform Chat tab (persisted across reloads) and the original structured Full Analysis tab.
 - What-If scenario mode with live recompute.
 - Data trust system wired end-to-end, now with a non-color (icon + border pattern) encoding for the monochrome design.
 - A guided sample-profile entry point for fast evaluation.
 - True-monochrome design system (`src/components/ui/*`) — zero color anywhere, status/hierarchy carried by weight, pattern, and icon.
-- Mobile-responsive down to 375px, including the advisor drawer and the new `/match/*` flow.
+- Mobile-responsive down to 375px, including the advisor drawer.
 - A retrieval-grounded structured AI advisor (Google Gemini API) — schema-constrained and server-sanitized citations, real (non-disguised) error state on failure. Live-verified against a real key on 2026-09-17, and again as part of this rebuild on 2026-09-18.
 - A global freeform chat advisor (Google Gemini API) — real multi-turn conversation, widened retrieval, persisted history. Live-verified 2026-09-18.
-- The Interview match method's conversation-to-priority-order extraction, with a live-verified static-quiz fallback on AI failure.
 - AI explanation layer (Google Gemini API) with a verified fallback to deterministic copy.
 - Saved programs with a dedicated view and filter.
 - Request/response schema validation (Zod) at every AI endpoint's server boundary.
 
 **Not yet built:**
-- Medicine and Arts program data (no credible sources found for the current university set).
+- Medicine program data (no credible sources found for the current university set).
 - A hosted database / accounts (local persistence only, by design).
 - Production deployment.
 - A formal accessibility audit.
