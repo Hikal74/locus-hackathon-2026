@@ -25,6 +25,8 @@ export const STORAGE_KEYS = {
   profile: "pathlight:profile",
   roadmapProgress: "pathlight:roadmap-progress",
   savedPrograms: "pathlight:saved-programs",
+  matchResult: "pathlight:match-result",
+  advisorChat: "pathlight:advisor-chat",
 } as const;
 
 /**

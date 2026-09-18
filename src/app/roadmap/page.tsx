@@ -1,13 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import { ClayBadge } from "@/components/clay/ClayBadge";
-import { ClayCard } from "@/components/clay/ClayCard";
-import { ClayProgress } from "@/components/clay/ClayProgress";
+import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
+import { Progress } from "@/components/ui/Progress";
 import { RequireProfile } from "@/components/layout/RequireProfile";
 import { universities, programs } from "@/lib/data/dataset";
 import { getRecommendations } from "@/lib/engine/recommend";
 import { buildRoadmap, computeReadiness, type RoadmapPriority } from "@/lib/engine/roadmap";
+import { useMatchWeights } from "@/lib/store/match-weights";
 import { STORAGE_KEYS, useLocalStorageValue } from "@/lib/store/local-storage";
 import type { StudentProfile } from "@/lib/data/types";
 import { cn } from "@/lib/utils/cn";
@@ -16,7 +17,11 @@ const PRIORITY_LABELS: Record<RoadmapPriority, string> = { now: "Now", next: "Ne
 const NO_COMPLETED_TASKS: string[] = [];
 
 function RoadmapBody({ profile }: { profile: StudentProfile }) {
-  const { recommendations } = useMemo(() => getRecommendations(profile, universities, programs), [profile]);
+  const { result: matchResult } = useMatchWeights();
+  const { recommendations } = useMemo(
+    () => getRecommendations(profile, universities, programs, matchResult.weights),
+    [profile, matchResult.weights]
+  );
   const tasks = useMemo(() => buildRoadmap(profile, recommendations), [profile, recommendations]);
   const [completedIds, setCompletedIds] = useLocalStorageValue<string[]>(
     STORAGE_KEYS.roadmapProgress,
@@ -46,22 +51,22 @@ function RoadmapBody({ profile }: { profile: StudentProfile }) {
       <p className="mt-2 text-ink-soft">Built from your top {Math.min(3, recommendations.length)} matched programs.</p>
 
       {nextAction && (
-        <ClayCard padding="lg" className="mt-8 border-2 border-primary/20">
-          <p className="text-xs font-medium uppercase tracking-wide text-primary">Your next move</p>
+        <Card padding="lg" className="mt-8">
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">Your next move</p>
           <h2 className="mt-1 text-xl font-semibold text-ink">{nextAction.title}</h2>
           <p className="mt-2 text-sm text-ink-soft">{nextAction.reason}</p>
-        </ClayCard>
+        </Card>
       )}
 
-      <ClayCard padding="md" className="mt-6">
+      <Card padding="md" className="mt-6">
         <h2 className="font-semibold text-ink">Readiness</h2>
         <p className="mt-1 text-xs text-ink-faint">Based on completed tasks below — not an admission probability.</p>
         <div className="mt-4 flex flex-col gap-4">
           {readiness.map((r) => (
-            <ClayProgress key={r.label} label={r.label} value={r.value} />
+            <Progress key={r.label} label={r.label} value={r.value} />
           ))}
         </div>
-      </ClayCard>
+      </Card>
 
       <div className="mt-8 flex flex-col gap-6">
         {(["now", "next", "later"] as RoadmapPriority[]).map((priority) => {
@@ -69,17 +74,17 @@ function RoadmapBody({ profile }: { profile: StudentProfile }) {
           if (group.length === 0) return null;
           return (
             <div key={priority}>
-              <ClayBadge tone={priority === "now" ? "accent" : "neutral"}>{PRIORITY_LABELS[priority]}</ClayBadge>
+              <Badge tone={priority === "now" ? "accent" : "neutral"}>{PRIORITY_LABELS[priority]}</Badge>
               <div className="mt-3 flex flex-col gap-2">
                 {group.map((task) => {
                   const done = completedIds.includes(task.id);
                   return (
-                    <ClayCard key={task.id} padding="sm" className="flex items-start gap-3">
+                    <Card key={task.id} padding="sm" className="flex items-start gap-3">
                       <input
                         type="checkbox"
                         checked={done}
                         onChange={() => toggleTask(task.id)}
-                        className="mt-1 h-4 w-4 shrink-0 accent-[var(--color-primary)]"
+                        className="mt-1 h-4 w-4 shrink-0 accent-[var(--color-ink)]"
                         aria-label={`Mark "${task.title}" as done`}
                       />
                       <div>
@@ -88,7 +93,7 @@ function RoadmapBody({ profile }: { profile: StudentProfile }) {
                         </p>
                         <p className="text-xs text-ink-faint">{task.reason}</p>
                       </div>
-                    </ClayCard>
+                    </Card>
                   );
                 })}
               </div>

@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ClayButton } from "@/components/clay/ClayButton";
-import { ClayCard } from "@/components/clay/ClayCard";
-import { ClayChip } from "@/components/clay/ClayChip";
-import { ClayInput } from "@/components/clay/ClayInput";
-import { ClayProgress } from "@/components/clay/ClayProgress";
-import { ClayTextarea } from "@/components/clay/ClayTextarea";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Chip } from "@/components/ui/Chip";
+import { Input } from "@/components/ui/Input";
+import { Progress } from "@/components/ui/Progress";
+import { Textarea } from "@/components/ui/Textarea";
 import { useProfile } from "@/lib/store/profile-context";
 import { programs } from "@/lib/data/dataset";
 import type { Country, FieldOfStudy, LanguageRequirement, StudentProfile } from "@/lib/data/types";
@@ -122,13 +122,9 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
-      <ClayProgress
-        label={`Step ${step + 1} of ${STEP_COUNT}`}
-        value={((step + 1) / STEP_COUNT) * 100}
-        className="mb-8"
-      />
+      <Progress label={`Step ${step + 1} of ${STEP_COUNT}`} value={((step + 1) / STEP_COUNT) * 100} className="mb-8" />
 
-      <ClayCard padding="lg" className="flex flex-col gap-6">
+      <Card padding="lg" className="flex flex-col gap-6">
         {step === 0 && (
           <>
             <h1 className="text-2xl font-semibold text-ink">What do you want to study?</h1>
@@ -136,13 +132,9 @@ export default function ProfilePage() {
               <span className="text-sm font-medium text-ink-soft">Field</span>
               <div className="flex flex-wrap gap-2">
                 {FIELD_OPTIONS.map((opt) => (
-                  <ClayChip
-                    key={opt.value}
-                    selected={draft.intendedField === opt.value}
-                    onClick={() => update("intendedField", opt.value)}
-                  >
+                  <Chip key={opt.value} selected={draft.intendedField === opt.value} onClick={() => update("intendedField", opt.value)}>
                     {opt.label}
-                  </ClayChip>
+                  </Chip>
                 ))}
               </div>
               {!FIELDS_WITH_PROGRAMS.has(draft.intendedField) && (
@@ -155,13 +147,13 @@ export default function ProfilePage() {
               <span className="text-sm font-medium text-ink-soft">Specific interests (optional, pick any that fit)</span>
               <div className="flex flex-wrap gap-2">
                 {INTEREST_OPTIONS.map((interest) => (
-                  <ClayChip
+                  <Chip
                     key={interest}
                     selected={draft.interests.includes(interest)}
                     onClick={() => update("interests", toggle(draft.interests, interest))}
                   >
                     {interest}
-                  </ClayChip>
+                  </Chip>
                 ))}
               </div>
             </div>
@@ -178,14 +170,14 @@ export default function ProfilePage() {
               {COUNTRY_OPTIONS.map((country) => {
                 const rank = draft.countryPreferences.indexOf(country);
                 return (
-                  <ClayChip
+                  <Chip
                     key={country}
                     selected={rank !== -1}
                     onClick={() => update("countryPreferences", toggle(draft.countryPreferences, country))}
                   >
                     {rank !== -1 ? `${rank + 1}. ` : ""}
                     {country}
-                  </ClayChip>
+                  </Chip>
                 );
               })}
             </div>
@@ -195,7 +187,7 @@ export default function ProfilePage() {
         {step === 2 && (
           <>
             <h1 className="text-2xl font-semibold text-ink">What matters most?</h1>
-            <ClayInput
+            <Input
               label="Budget per year (USD)"
               type="number"
               min={0}
@@ -204,18 +196,12 @@ export default function ProfilePage() {
               hint="Tuition only — we'll flag programs that need scholarships to close the gap rather than hiding them."
             />
             <div className="flex flex-col gap-2">
-              <ClayChip
-                selected={draft.prioritizeResearch}
-                onClick={() => update("prioritizeResearch", !draft.prioritizeResearch)}
-              >
+              <Chip selected={draft.prioritizeResearch} onClick={() => update("prioritizeResearch", !draft.prioritizeResearch)}>
                 Research opportunities matter to me
-              </ClayChip>
-              <ClayChip
-                selected={draft.prioritizeScholarship}
-                onClick={() => update("prioritizeScholarship", !draft.prioritizeScholarship)}
-              >
+              </Chip>
+              <Chip selected={draft.prioritizeScholarship} onClick={() => update("prioritizeScholarship", !draft.prioritizeScholarship)}>
                 Scholarship availability matters to me
-              </ClayChip>
+              </Chip>
             </div>
           </>
         )}
@@ -223,7 +209,7 @@ export default function ProfilePage() {
         {step === 3 && (
           <>
             <h1 className="text-2xl font-semibold text-ink">Where are you academically?</h1>
-            <ClayInput
+            <Input
               label="GPA (4.0 scale, optional)"
               type="number"
               step="0.1"
@@ -233,7 +219,7 @@ export default function ProfilePage() {
               onChange={(e) => update("gpaOn4Scale", e.target.value)}
               hint="Leave blank if you use a different grading scale — we won't penalize missing data."
             />
-            <ClayInput
+            <Input
               label="English level (optional)"
               placeholder="e.g. IELTS 6.5"
               value={draft.englishLevel}
@@ -243,13 +229,9 @@ export default function ProfilePage() {
               <span className="text-sm font-medium text-ink-soft">Exams already completed</span>
               <div className="flex flex-wrap gap-2">
                 {EXAM_OPTIONS.map((exam) => (
-                  <ClayChip
-                    key={exam}
-                    selected={draft.examsCompleted.includes(exam)}
-                    onClick={() => update("examsCompleted", toggle(draft.examsCompleted, exam))}
-                  >
+                  <Chip key={exam} selected={draft.examsCompleted.includes(exam)} onClick={() => update("examsCompleted", toggle(draft.examsCompleted, exam))}>
                     {exam}
-                  </ClayChip>
+                  </Chip>
                 ))}
               </div>
             </div>
@@ -265,7 +247,7 @@ export default function ProfilePage() {
               AI advisor, which reads it and reasons about it directly, so write in your own words instead of trying
               to fit a form field.
             </p>
-            <ClayTextarea
+            <Textarea
               label="In your own words"
               placeholder="e.g. Built a machine-learning project that placed top 3 in a national science fair; captain of the robotics club; want to eventually work in AI research but worried my portfolio is thin outside of coursework…"
               rows={6}
@@ -280,7 +262,7 @@ export default function ProfilePage() {
         {step === 5 && (
           <>
             <h1 className="text-2xl font-semibold text-ink">One more thing</h1>
-            <ClayInput
+            <Input
               label="Intended intake"
               placeholder="e.g. Fall 2027"
               value={draft.intendedIntake}
@@ -293,22 +275,18 @@ export default function ProfilePage() {
         )}
 
         <div className="flex justify-between pt-2">
-          <ClayButton
-            variant="ghost"
-            onClick={() => setStep((s) => Math.max(0, s - 1))}
-            disabled={step === 0}
-          >
+          <Button variant="ghost" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0}>
             Back
-          </ClayButton>
+          </Button>
           {step < STEP_COUNT - 1 ? (
-            <ClayButton onClick={() => setStep((s) => s + 1)} disabled={!canAdvance()}>
+            <Button onClick={() => setStep((s) => s + 1)} disabled={!canAdvance()}>
               Continue
-            </ClayButton>
+            </Button>
           ) : (
-            <ClayButton onClick={submit}>See my diagnosis</ClayButton>
+            <Button onClick={submit}>See my diagnosis</Button>
           )}
         </div>
-      </ClayCard>
+      </Card>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { Type } from "@google/genai";
 import { getGeminiClient, isAiConfigured, AI_MODEL } from "./client";
+import { classifyGeminiError, type AiFailureReason } from "./errors";
 
 export interface ExplanationFacts {
   universityName: string;
@@ -8,13 +9,7 @@ export interface ExplanationFacts {
   watchOut: string[];
 }
 
-export type RephraseFailureReason =
-  | "not_configured"
-  | "invalid_key"
-  | "rate_limited"
-  | "api_error"
-  | "malformed_response"
-  | "network_error";
+export type RephraseFailureReason = AiFailureReason;
 
 export type RephraseResult =
   | { ok: true; data: ExplanationFacts }
@@ -38,14 +33,6 @@ const RESPONSE_SCHEMA = {
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
-}
-
-function classifyError(error: unknown): RephraseFailureReason {
-  const status = (error as { status?: unknown } | null)?.status;
-  if (status === 401 || status === 403) return "invalid_key";
-  if (status === 429) return "rate_limited";
-  if (typeof status === "number") return "api_error";
-  return "network_error";
 }
 
 /**
@@ -104,6 +91,6 @@ export async function rephraseExplanation(facts: ExplanationFacts): Promise<Reph
       },
     };
   } catch (error) {
-    return { ok: false, reason: classifyError(error) };
+    return { ok: false, reason: classifyGeminiError(error) };
   }
 }

@@ -17,7 +17,7 @@ interface SourcedFact<T> {
 - **`needs_verification`** — a plausible figure from a secondary source (a third-party aggregator, a government budget report, a catalog page that isn't the school's own finance office), likely close but not confirmed current.
 - **`demo_data`** — no reliable figure was found; a value is estimated to keep the product demo-able, and honestly labeled as such rather than presented as fact.
 
-Every place a `SourcedFact` value is shown in the UI, it's paired with a `VerificationBadge` (`src/components/clay/ClayBadge.tsx`) — a colored pill (green/amber/gray) — so the product never lets a guess look like a confirmed number.
+Every place a `SourcedFact` value is shown in the UI, it's paired with a `VerificationBadge` (`src/components/ui/Badge.tsx`) — a monochrome pill distinguished by icon and border pattern (filled check / dashed outline+"?" / dotted outline), not color — so the product never lets a guess look like a confirmed number.
 
 ## Current dataset: 26 programs, 5 fields, 9 universities
 

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ClayButton } from "@/components/clay/ClayButton";
-import { ClayCard } from "@/components/clay/ClayCard";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { ExampleButton } from "@/components/landing/ExampleButton";
 import { programs } from "@/lib/data/dataset";
 
@@ -21,6 +21,8 @@ const PILLARS = [
   },
 ];
 
+const METHOD_NAMES = ["Duels", "Rank", "Fit Map", "Interview"];
+
 export default function LandingPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
@@ -30,17 +32,18 @@ export default function LandingPage() {
             Your university path, without the guesswork.
           </h1>
           <p className="max-w-xl text-lg text-ink-soft">
-            Tell us what you want to study, where you want to go, and what matters to you. We&apos;ll turn it into a
-            personalized application plan — with the reasoning shown, not hidden.
+            Tell us what you want to study, where you want to go, and what matters to you. Then pick how you want to
+            find your matches — {METHOD_NAMES.join(", ")} — and an AI advisor is one click away on every page to
+            answer anything else.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/profile">
-              <ClayButton size="lg">Build my path</ClayButton>
+              <Button size="lg">Build my path</Button>
             </Link>
             <ExampleButton />
           </div>
         </div>
-        <ClayCard padding="lg" className="flex flex-col gap-4">
+        <Card padding="lg" className="flex flex-col gap-4">
           <p className="text-sm font-medium text-ink-faint">This build&apos;s dataset</p>
           <p className="text-ink-soft">
             {programs.length} real programs across {fieldCount} fields of study in the{" "}
@@ -48,15 +51,15 @@ export default function LandingPage() {
             <strong className="text-ink">China</strong> — each fact labeled verified, needs-verification, or demo
             data, never presented as more certain than it is.
           </p>
-        </ClayCard>
+        </Card>
       </section>
 
       <section className="mt-20 grid gap-6 sm:grid-cols-3">
         {PILLARS.map((pillar) => (
-          <ClayCard key={pillar.title} padding="md">
+          <Card key={pillar.title} padding="md">
             <h2 className="text-lg font-semibold text-ink">{pillar.title}</h2>
             <p className="mt-2 text-sm text-ink-soft">{pillar.body}</p>
-          </ClayCard>
+          </Card>
         ))}
       </section>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { ClayButton } from "@/components/clay/ClayButton";
+import { Button } from "@/components/ui/Button";
 import { useProfile } from "@/lib/store/profile-context";
 import { sampleProfile } from "@/lib/data/sample-profile";
 
@@ -11,7 +11,7 @@ export function ExampleButton() {
   const router = useRouter();
 
   return (
-    <ClayButton
+    <Button
       variant="secondary"
       size="lg"
       onClick={() => {
@@ -20,6 +20,6 @@ export function ExampleButton() {
       }}
     >
       See an example
-    </ClayButton>
+    </Button>
   );
 }

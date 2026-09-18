@@ -1,22 +1,20 @@
 import { cn } from "@/lib/utils/cn";
 
-interface ClayProgressProps {
+interface ProgressProps {
   label: string;
   value: number; // 0-100
   tone?: "primary" | "accent" | "success" | "warning";
   className?: string;
 }
 
-const toneClasses = {
-  primary: "bg-primary",
-  accent: "bg-accent",
-  success: "bg-success",
-  warning: "bg-warning",
-};
-
-/** Readiness/progress bar. Never frame this as an admission probability — see docs/DATA_AND_TRUST.md. */
-export function ClayProgress({ label, value, tone = "primary", className }: ClayProgressProps) {
+/**
+ * Readiness/progress bar. Never frame this as an admission probability — see
+ * docs/DATA_AND_TRUST.md. Tone is kept for API compatibility but only
+ * changes the fill pattern (solid vs. hatched), never a hue.
+ */
+export function Progress({ label, value, tone = "primary", className }: ProgressProps) {
   const clamped = Math.max(0, Math.min(100, value));
+  const hatched = tone === "warning";
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       <div className="flex items-center justify-between text-sm">
@@ -29,10 +27,13 @@ export function ClayProgress({ label, value, tone = "primary", className }: Clay
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={label}
-        className="h-3 rounded-[var(--radius-pill)] bg-base shadow-[var(--shadow-clay-recessed)] overflow-hidden"
+        className="h-3 rounded-[var(--radius-pill)] bg-surface shadow-[var(--shadow-recessed)] border border-line-soft overflow-hidden"
       >
         <div
-          className={cn("h-full rounded-[var(--radius-pill)] transition-[width] duration-500 ease-out", toneClasses[tone])}
+          className={cn(
+            "h-full rounded-[var(--radius-pill)] bg-ink transition-[width] duration-500 ease-out",
+            hatched && "pattern-hatch"
+          )}
           style={{ width: `${clamped}%` }}
         />
       </div>

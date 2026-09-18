@@ -1,25 +1,38 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ClayButton } from "@/components/clay/ClayButton";
-import { ClayCard } from "@/components/clay/ClayCard";
-import { ClayChip } from "@/components/clay/ClayChip";
-import { ClayInput } from "@/components/clay/ClayInput";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Chip } from "@/components/ui/Chip";
+import { Input } from "@/components/ui/Input";
 import { RecommendationCard } from "@/components/recommendations/RecommendationCard";
-import { AdvisorPanel } from "@/components/advisor/AdvisorPanel";
 import { RequireProfile } from "@/components/layout/RequireProfile";
+import { useAdvisorUi } from "@/components/advisor/advisor-context";
 import { useProfile } from "@/lib/store/profile-context";
 import { useSavedPrograms } from "@/lib/store/saved-programs";
+import { useMatchWeights } from "@/lib/store/match-weights";
 import { universities, programs } from "@/lib/data/dataset";
 import { getRecommendations } from "@/lib/engine/recommend";
+import type { MatchMethod } from "@/lib/engine/personalize";
 import type { Country, StudentProfile } from "@/lib/data/types";
 
 const COUNTRY_OPTIONS: Country[] = ["USA", "Kazakhstan", "China"];
 
+const METHOD_LABELS: Record<MatchMethod, string> = {
+  duels: "Duels",
+  rank: "Rank",
+  map: "Fit Map",
+  interview: "Interview",
+  default: "balanced default weights",
+};
+
 function RecommendationsBody({ profile }: { profile: StudentProfile }) {
   const { setProfile } = useProfile();
   const router = useRouter();
+  const { openDrawer } = useAdvisorUi();
+  const { result: matchResult } = useMatchWeights();
   // Captured once on mount (lazy initializer) so later scenario edits can be diffed against the starting point.
   const [baselineSignature] = useState(() => JSON.stringify(profile));
 
@@ -28,7 +41,10 @@ function RecommendationsBody({ profile }: { profile: StudentProfile }) {
   const { savedIds } = useSavedPrograms();
   const [showSavedOnly, setShowSavedOnly] = useState(false);
 
-  const result = useMemo(() => getRecommendations(scenario, universities, programs), [scenario]);
+  const result = useMemo(
+    () => getRecommendations(scenario, universities, programs, matchResult.weights),
+    [scenario, matchResult.weights]
+  );
   const changed = JSON.stringify(scenario) !== baselineSignature;
   const visibleRecommendations = showSavedOnly
     ? result.recommendations.filter((rec) => savedIds.includes(rec.program.id))
@@ -55,27 +71,33 @@ function RecommendationsBody({ profile }: { profile: StudentProfile }) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 pb-28 pt-12 sm:px-6">
-      <h1 className="text-3xl font-semibold text-ink">Your recommendations</h1>
-      <p className="mt-2 text-ink-soft">
-        Ranked by fit to your profile — not a universal ranking. Adjust the controls below to see how your shortlist
-        changes.
-      </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-semibold text-ink">Your recommendations</h1>
+          <p className="mt-2 text-ink-soft">
+            Ranked by fit to your profile — not a universal ranking. Weighted using{" "}
+            <strong className="text-ink">{METHOD_LABELS[matchResult.method]}</strong>.{" "}
+            <Link href="/match" className="underline underline-offset-2">
+              Refine matches
+            </Link>
+          </p>
+        </div>
+        <Button variant="secondary" onClick={() => openDrawer("analysis")}>
+          Open AI Advisor
+        </Button>
+      </div>
 
-      <ClayCard padding="md" className="mt-6 flex flex-col gap-4">
+      <Card padding="md" className="mt-6 flex flex-col gap-4">
         <p className="text-xs font-medium text-ink-faint">What if…</p>
         <div className="flex flex-wrap gap-2">
           {COUNTRY_OPTIONS.map((country) => (
-            <ClayChip
-              key={country}
-              selected={scenario.countryPreferences.includes(country)}
-              onClick={() => toggleCountry(country)}
-            >
+            <Chip key={country} selected={scenario.countryPreferences.includes(country)} onClick={() => toggleCountry(country)}>
               {country}
-            </ClayChip>
+            </Chip>
           ))}
         </div>
         <div className="max-w-xs">
-          <ClayInput
+          <Input
             label="Budget per year (USD)"
             type="number"
             min={0}
@@ -84,34 +106,30 @@ function RecommendationsBody({ profile }: { profile: StudentProfile }) {
           />
         </div>
         {changed && (
-          <p className="text-sm font-medium text-primary" role="status">
+          <p className="text-sm font-medium text-ink" role="status">
             Your path changed — recommendations below reflect your new answers.
           </p>
         )}
-      </ClayCard>
-
-      <div className="mt-6">
-        <AdvisorPanel profile={scenario} />
-      </div>
+      </Card>
 
       <div className="mt-6 flex items-center justify-between">
         <h2 className="text-sm font-medium text-ink-faint">
           {visibleRecommendations.length} program{visibleRecommendations.length === 1 ? "" : "s"}
         </h2>
-        <ClayChip selected={showSavedOnly} onClick={() => setShowSavedOnly((v) => !v)} className="text-xs">
+        <Chip selected={showSavedOnly} onClick={() => setShowSavedOnly((v) => !v)} className="text-xs">
           Saved only {savedIds.length > 0 ? `(${savedIds.length})` : ""}
-        </ClayChip>
+        </Chip>
       </div>
 
       <div className="mt-4 flex flex-col gap-4">
         {visibleRecommendations.length === 0 && (
-          <ClayCard padding="md">
+          <Card padding="md">
             <p className="text-ink-soft">
               {showSavedOnly
                 ? "You haven't saved any programs yet — tap \"Save\" on a card below to add one."
                 : "No programs match those filters in this build's dataset. Try widening your countries or budget above."}
             </p>
-          </ClayCard>
+          </Card>
         )}
         {visibleRecommendations.map((rec) => (
           <RecommendationCard
@@ -130,16 +148,12 @@ function RecommendationsBody({ profile }: { profile: StudentProfile }) {
         </p>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-[var(--color-border)] bg-base/95 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-paper/95 backdrop-blur">
         <div className="mx-auto flex max-w-4xl justify-end gap-3 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] sm:px-6">
-          <ClayButton
-            variant="secondary"
-            disabled={selectedIds.length < 2}
-            onClick={() => router.push(`/compare?ids=${selectedIds.join(",")}`)}
-          >
+          <Button variant="secondary" disabled={selectedIds.length < 2} onClick={() => router.push(`/compare?ids=${selectedIds.join(",")}`)}>
             Compare selected ({selectedIds.length})
-          </ClayButton>
-          <ClayButton onClick={() => router.push("/roadmap")}>Build my roadmap</ClayButton>
+          </Button>
+          <Button onClick={() => router.push("/roadmap")}>Build my roadmap</Button>
         </div>
       </div>
     </div>

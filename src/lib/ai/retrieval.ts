@@ -93,3 +93,63 @@ export function retrievedProgramIds(context: RetrievedContext): string[] {
     ...context.excludedSample.map((e) => e.program.id),
   ];
 }
+
+/** A record surfaced to the freeform chat advisor. `fitScore`/`factors` are only present when a profile was supplied. */
+export interface ChatRecord {
+  program: Program;
+  university: University;
+  fitScore?: number;
+  factors?: FactorScore[];
+}
+
+const MAX_CHAT_RECORDS = 10;
+const MAX_CHAT_PROFILE_RECORDS = 6;
+
+/**
+ * Retrieval for the always-available chat panel (src/lib/ai/chat.ts), which
+ * unlike the structured advisor above must answer questions unrelated to the
+ * student's own fit ("what's the IELTS requirement at KBTU?"). Widens
+ * `retrieveContext`'s profile-based retrieval with a simple keyword match
+ * against the question text — still deterministic, still capped, no vector
+ * search or embeddings.
+ */
+export function retrieveForQuery(
+  query: string,
+  profile: StudentProfile | null,
+  universities: University[],
+  programs: Program[],
+  weights?: Record<FactorScore["key"], number>
+): ChatRecord[] {
+  const records: ChatRecord[] = [];
+  const seen = new Set<string>();
+
+  if (profile) {
+    const { recommendations } = getRecommendations(profile, universities, programs, weights);
+    for (const rec of recommendations.slice(0, MAX_CHAT_PROFILE_RECORDS)) {
+      records.push({ program: rec.program, university: rec.university, fitScore: rec.fitScore, factors: rec.factors });
+      seen.add(rec.program.id);
+    }
+  }
+
+  const words = query
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length > 2);
+
+  if (words.length > 0) {
+    const universityById = new Map(universities.map((u) => [u.id, u]));
+    for (const program of programs) {
+      if (records.length >= MAX_CHAT_RECORDS) break;
+      if (seen.has(program.id)) continue;
+      const university = universityById.get(program.universityId);
+      if (!university) continue;
+      const haystack = `${university.name} ${program.name} ${university.country} ${university.city} ${program.tags.join(" ")}`.toLowerCase();
+      if (words.some((w) => haystack.includes(w))) {
+        records.push({ program, university });
+        seen.add(program.id);
+      }
+    }
+  }
+
+  return records.slice(0, MAX_CHAT_RECORDS);
+}

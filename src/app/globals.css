@@ -1,78 +1,53 @@
 @import "tailwindcss";
 
 /*
-  Design tokens for the "clay" surface system.
-  Palette is warm-neutral (sand/stone) rather than cool AI-gradient defaults,
-  so the product reads as a considered admissions tool, not a generic AI demo.
-  Shadow pairs (light highlight + dark shadow) are what produce the tactile
-  "inflated" clay look; recessed variants invert the pair for inputs/wells.
+  True monochrome design tokens. No hue anywhere in the system — status and
+  hierarchy are carried by weight (fill vs. outline), pattern (solid vs.
+  dashed vs. dotted vs. hatched), and icon, never by color. Depth comes from
+  hard offset shadows (editorial/poster feel) instead of soft neumorphism.
 */
 :root {
-  --color-base: #eee7db;
-  --color-surface: #f6f1e7;
-  --color-surface-raised: #faf6ee;
-  --color-ink: #2b2621;
-  --color-ink-soft: #5b5349;
-  --color-ink-faint: #8a8175;
+  --color-paper: #ffffff;
+  --color-surface: #f4f4f4;
+  --color-surface-raised: #ffffff;
+  --color-ink: #0a0a0a;
+  --color-ink-soft: #454545;
+  --color-ink-faint: #8f8f8f;
 
-  --color-primary: #37584c;
-  --color-primary-soft: #4d7364;
-  --color-on-primary: #f4efe4;
+  --color-line: #0a0a0a;
+  --color-line-soft: rgba(10, 10, 10, 0.16);
 
-  --color-accent: #c1613d;
-  --color-accent-soft: #d67e58;
-  --color-on-accent: #fbf3ec;
+  --color-primary: #0a0a0a;
+  --color-on-primary: #ffffff;
 
-  --color-success: #4c7a5d;
-  --color-warning: #b3872e;
-  --color-danger: #b3503f;
-
-  --color-border: rgba(43, 38, 33, 0.1);
-
-  --clay-highlight: rgba(255, 255, 255, 0.75);
-  --clay-shadow: rgba(43, 38, 33, 0.22);
-  --clay-shadow-strong: rgba(43, 38, 33, 0.32);
-
-  --radius-sm: 12px;
-  --radius-md: 18px;
-  --radius-lg: 26px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
   --radius-pill: 999px;
 
-  /* Raised clay surface (cards, buttons at rest) */
-  --shadow-clay-raised: -6px -6px 14px var(--clay-highlight),
-    8px 10px 20px var(--clay-shadow);
-  /* Slightly higher-contrast raised state, used on hover */
-  --shadow-clay-raised-hover: -6px -6px 14px var(--clay-highlight),
-    10px 14px 26px var(--clay-shadow-strong);
-  /* Pressed / active state — shadow compresses toward the surface */
-  --shadow-clay-pressed: -2px -2px 6px var(--clay-highlight),
-    3px 4px 8px var(--clay-shadow);
-  /* Recessed surface (inputs, wells) — shadow pair inverted, sits inward */
-  --shadow-clay-recessed: inset 4px 4px 10px var(--clay-shadow),
-    inset -4px -4px 10px var(--clay-highlight);
+  --shadow-raised: 4px 4px 0 0 var(--color-ink);
+  --shadow-raised-hover: 6px 6px 0 0 var(--color-ink);
+  --shadow-pressed: 1px 1px 0 0 var(--color-ink);
+  --shadow-recessed: inset 0 2px 5px rgba(10, 10, 10, 0.14);
+  --ring-focus: 0 0 0 3px rgba(10, 10, 10, 0.22);
 
-  --background: var(--color-base);
+  --background: var(--color-paper);
   --foreground: var(--color-ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-base: var(--color-base);
+  --color-paper: var(--color-paper);
   --color-surface: var(--color-surface);
   --color-surface-raised: var(--color-surface-raised);
   --color-ink: var(--color-ink);
   --color-ink-soft: var(--color-ink-soft);
   --color-ink-faint: var(--color-ink-faint);
+  --color-line: var(--color-line);
+  --color-line-soft: var(--color-line-soft);
   --color-primary: var(--color-primary);
-  --color-primary-soft: var(--color-primary-soft);
   --color-on-primary: var(--color-on-primary);
-  --color-accent: var(--color-accent);
-  --color-accent-soft: var(--color-accent-soft);
-  --color-on-accent: var(--color-on-accent);
-  --color-success: var(--color-success);
-  --color-warning: var(--color-warning);
-  --color-danger: var(--color-danger);
   --font-sans: var(--font-outfit), var(--font-geist-sans), system-ui, sans-serif;
 }
 
@@ -80,6 +55,22 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+/* Hatch pattern used in place of a "warning" hue — see Progress/Badge. */
+.pattern-hatch {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--color-ink) 0,
+    var(--color-ink) 2px,
+    transparent 2px,
+    transparent 7px
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {

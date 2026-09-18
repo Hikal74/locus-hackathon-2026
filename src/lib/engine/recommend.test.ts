@@ -50,4 +50,45 @@ describe("getRecommendations", () => {
       expect(rec.fitScore).toBeLessThanOrEqual(100);
     }
   });
+
+  it("a custom weight vector changes ranking versus the default weights", () => {
+    // "strong" wins on academics/requirements, "cheap" wins hugely on budget.
+    const strong = { ...testProgram, id: "strong" };
+    const cheap = {
+      ...testProgram,
+      id: "cheap",
+      tuitionPerYearUSD: { value: 2000, status: "verified" as const },
+      minGpaOn4Scale: { value: 3.95, status: "demo_data" as const },
+      examRequirements: [{ name: "SAT", required: true }],
+      languageRequirements: [],
+    };
+    const budgetOnly = {
+      academic: 0,
+      interest: 0,
+      budget: 1,
+      requirements: 0,
+      location: 0,
+      preferences: 0,
+    };
+    const { recommendations } = getRecommendations(
+      testProfile,
+      [testUniversity],
+      [strong, cheap],
+      budgetOnly
+    );
+    expect(recommendations[0].program.id).toBe("cheap");
+  });
+
+  it("defaults to FIT_WEIGHTS when no weight vector is passed", () => {
+    const withDefault = getRecommendations(testProfile, [testUniversity], [testProgram]);
+    const withExplicitDefault = getRecommendations(testProfile, [testUniversity], [testProgram], {
+      academic: 0.25,
+      interest: 0.2,
+      budget: 0.2,
+      requirements: 0.15,
+      location: 0.1,
+      preferences: 0.1,
+    });
+    expect(withDefault.recommendations[0].fitScore).toBe(withExplicitDefault.recommendations[0].fitScore);
+  });
 });

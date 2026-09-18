@@ -1,14 +1,15 @@
 import { InputHTMLAttributes, forwardRef, useId } from "react";
 import { cn } from "@/lib/utils/cn";
+import { WarningIcon } from "./icons";
 
-interface ClayInputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
   hint?: string;
 }
 
-/** Recessed clay input — sits "pressed into" the surface, label always visible. */
-export const ClayInput = forwardRef<HTMLInputElement, ClayInputProps>(
+/** Recessed field — thin inset shadow reads as "pressed into" the page, label always visible. */
+export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, hint, id, className, ...props }, ref) => {
     const generatedId = useId();
     const inputId = id ?? generatedId;
@@ -26,10 +27,10 @@ export const ClayInput = forwardRef<HTMLInputElement, ClayInputProps>(
           aria-describedby={cn(hintId, errorId) || undefined}
           aria-invalid={Boolean(error)}
           className={cn(
-            "bg-surface rounded-[var(--radius-sm)] px-4 py-3 text-ink placeholder:text-ink-faint",
-            "shadow-[var(--shadow-clay-recessed)] outline-none border border-transparent",
-            "focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/30",
-            error && "focus-visible:ring-danger/40",
+            "bg-paper rounded-[var(--radius-sm)] px-4 py-3 text-ink placeholder:text-ink-faint",
+            "shadow-[var(--shadow-recessed)] outline-none border-2 border-ink",
+            "focus-visible:shadow-[var(--ring-focus)]",
+            error && "outline-offset-2",
             className
           )}
           {...props}
@@ -40,7 +41,8 @@ export const ClayInput = forwardRef<HTMLInputElement, ClayInputProps>(
           </span>
         )}
         {error && (
-          <span id={errorId} className="text-xs text-danger">
+          <span id={errorId} className="flex items-center gap-1.5 text-xs font-medium text-ink">
+            <WarningIcon width={12} height={12} />
             {error}
           </span>
         )}
@@ -48,4 +50,4 @@ export const ClayInput = forwardRef<HTMLInputElement, ClayInputProps>(
     );
   }
 );
-ClayInput.displayName = "ClayInput";
+Input.displayName = "Input";

@@ -8,6 +8,7 @@ import { useProfile } from "@/lib/store/profile-context";
 const STEPS = [
   { href: "/profile", label: "Profile" },
   { href: "/diagnosis", label: "Diagnosis" },
+  { href: "/match", label: "Match" },
   { href: "/recommendations", label: "Recommendations" },
   { href: "/compare", label: "Compare" },
   { href: "/roadmap", label: "Roadmap" },
@@ -19,22 +20,22 @@ export function NavBar() {
   const { profile } = useProfile();
 
   return (
-    <header className="sticky top-[env(safe-area-inset-top,0px)] z-10 border-b border-[var(--color-border)] bg-base/90 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+    <header className="sticky top-[env(safe-area-inset-top,0px)] z-30 border-b-2 border-ink bg-paper/95 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
         <Link href="/" className="text-lg font-semibold tracking-tight text-ink">
           Pathlight
         </Link>
         {profile && (
-          <nav className="flex flex-wrap items-center gap-1 text-sm">
+          <nav className="flex w-full flex-nowrap items-center gap-1 overflow-x-auto text-sm sm:w-auto sm:ml-auto">
             {STEPS.map((step) => {
-              const active = pathname === step.href;
+              const active = pathname === step.href || (step.href !== "/" && pathname.startsWith(`${step.href}/`));
               return (
                 <Link
                   key={step.href}
                   href={step.href}
                   className={cn(
-                    "rounded-[var(--radius-pill)] px-3 py-1.5 transition-colors",
-                    active ? "bg-primary text-on-primary" : "text-ink-soft hover:bg-surface"
+                    "shrink-0 rounded-[var(--radius-pill)] px-3 py-1.5 border-2 transition-colors",
+                    active ? "border-ink bg-ink text-on-primary" : "border-transparent text-ink-soft hover:border-ink"
                   )}
                 >
                   {step.label}

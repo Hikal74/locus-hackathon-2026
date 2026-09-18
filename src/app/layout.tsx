@@ -3,6 +3,9 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { ProfileProvider } from "@/lib/store/profile-context";
 import { NavBar } from "@/components/layout/NavBar";
+import { AdvisorUiProvider } from "@/components/advisor/advisor-context";
+import { AdvisorLauncher } from "@/components/advisor/AdvisorLauncher";
+import { AdvisorDrawer } from "@/components/advisor/AdvisorDrawer";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -19,10 +22,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${outfit.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-base text-ink">
+      <body className="min-h-full flex flex-col bg-paper text-ink">
         <ProfileProvider>
-          <NavBar />
-          <main className="flex-1">{children}</main>
+          <AdvisorUiProvider>
+            <NavBar />
+            <main className="flex-1">{children}</main>
+            <AdvisorLauncher />
+            <AdvisorDrawer />
+          </AdvisorUiProvider>
         </ProfileProvider>
       </body>
     </html>

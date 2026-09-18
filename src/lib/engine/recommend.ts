@@ -30,7 +30,8 @@ function hardFilterReason(profile: StudentProfile, university: University, progr
 export function getRecommendations(
   profile: StudentProfile,
   universities: University[],
-  programs: Program[]
+  programs: Program[],
+  weights: Record<FactorScore["key"], number> = FIT_WEIGHTS
 ): RecommendationResult {
   const universityById = new Map(universities.map((u) => [u.id, u]));
   const recommendations: Recommendation[] = [];
@@ -56,7 +57,7 @@ export function getRecommendations(
       { key: "preferences", label: "Preference fit", score: preferencesFit(profile, program, university) },
     ];
 
-    const fitScore = Math.round(factors.reduce((sum, f) => sum + f.score * FIT_WEIGHTS[f.key], 0));
+    const fitScore = Math.round(factors.reduce((sum, f) => sum + f.score * weights[f.key], 0));
 
     recommendations.push({
       program,

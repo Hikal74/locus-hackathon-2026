@@ -1,14 +1,15 @@
 import { TextareaHTMLAttributes, forwardRef, useId } from "react";
 import { cn } from "@/lib/utils/cn";
+import { WarningIcon } from "./icons";
 
-interface ClayTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   error?: string;
   hint?: string;
 }
 
-/** Recessed clay textarea — same visual language as ClayInput, for free-text answers. */
-export const ClayTextarea = forwardRef<HTMLTextAreaElement, ClayTextareaProps>(
+/** Same recessed visual language as Input, for free-text answers. */
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, hint, id, className, ...props }, ref) => {
     const generatedId = useId();
     const inputId = id ?? generatedId;
@@ -26,10 +27,9 @@ export const ClayTextarea = forwardRef<HTMLTextAreaElement, ClayTextareaProps>(
           aria-describedby={cn(hintId, errorId) || undefined}
           aria-invalid={Boolean(error)}
           className={cn(
-            "bg-surface rounded-[var(--radius-sm)] px-4 py-3 text-ink placeholder:text-ink-faint",
-            "shadow-[var(--shadow-clay-recessed)] outline-none border border-transparent resize-y",
-            "focus-visible:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/30",
-            error && "focus-visible:ring-danger/40",
+            "bg-paper rounded-[var(--radius-sm)] px-4 py-3 text-ink placeholder:text-ink-faint",
+            "shadow-[var(--shadow-recessed)] outline-none border-2 border-ink resize-y",
+            "focus-visible:shadow-[var(--ring-focus)]",
             className
           )}
           {...props}
@@ -40,7 +40,8 @@ export const ClayTextarea = forwardRef<HTMLTextAreaElement, ClayTextareaProps>(
           </span>
         )}
         {error && (
-          <span id={errorId} className="text-xs text-danger">
+          <span id={errorId} className="flex items-center gap-1.5 text-xs font-medium text-ink">
+            <WarningIcon width={12} height={12} />
             {error}
           </span>
         )}
@@ -48,4 +49,4 @@ export const ClayTextarea = forwardRef<HTMLTextAreaElement, ClayTextareaProps>(
     );
   }
 );
-ClayTextarea.displayName = "ClayTextarea";
+Textarea.displayName = "Textarea";

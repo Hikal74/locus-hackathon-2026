@@ -3,18 +3,20 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { ClayButton } from "@/components/clay/ClayButton";
-import { ClayCard } from "@/components/clay/ClayCard";
-import { VerificationBadge } from "@/components/clay/ClayBadge";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { VerificationBadge } from "@/components/ui/Badge";
 import { RequireProfile } from "@/components/layout/RequireProfile";
 import { universities, programs } from "@/lib/data/dataset";
 import { getRecommendations } from "@/lib/engine/recommend";
+import { useMatchWeights } from "@/lib/store/match-weights";
 import type { StudentProfile } from "@/lib/data/types";
 
 function CompareContent({ profile }: { profile: StudentProfile }) {
   const params = useSearchParams();
+  const { result: matchResult } = useMatchWeights();
   const ids = (params.get("ids") ?? "").split(",").filter(Boolean);
-  const { recommendations } = getRecommendations(profile, universities, programs);
+  const { recommendations } = getRecommendations(profile, universities, programs, matchResult.weights);
   const selected = recommendations.filter((r) => ids.includes(r.program.id));
 
   if (selected.length < 2) {
@@ -22,7 +24,7 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <p className="text-ink-soft">Select at least 2 programs from your recommendations to compare.</p>
         <Link href="/recommendations" className="mt-4 inline-block">
-          <ClayButton>Back to recommendations</ClayButton>
+          <Button>Back to recommendations</Button>
         </Link>
       </div>
     );
@@ -124,9 +126,7 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
             <Row label="Watch out">
               {selected.map((rec) => (
                 <Cell key={rec.program.id}>
-                  {rec.watchOut.length === 0
-                    ? "Nothing flagged"
-                    : rec.watchOut.map((w) => <div key={w}>• {w}</div>)}
+                  {rec.watchOut.length === 0 ? "Nothing flagged" : rec.watchOut.map((w) => <div key={w}>• {w}</div>)}
                 </Cell>
               ))}
             </Row>
@@ -134,20 +134,20 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
         </table>
       </div>
 
-      <ClayCard padding="md" className="mt-8">
+      <Card padding="md" className="mt-8">
         <p className="text-sm text-ink-soft">
           No single option is objectively &quot;best&quot; here — {selected[0].university.name} scores higher on fit to your
           stated preferences, while the others may suit you better if your budget, country priority, or research
           interest shifts. Use the what-if controls on the recommendations page to test that.
         </p>
-      </ClayCard>
+      </Card>
     </div>
   );
 }
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <tr className="border-t border-[var(--color-border)]">
+    <tr className="border-t-2 border-line-soft">
       <th scope="row" className="whitespace-nowrap py-3 pr-3 text-left align-top text-xs font-medium text-ink-faint">
         {label}
       </th>

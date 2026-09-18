@@ -5,14 +5,9 @@ import { getGeminiClient, isAiConfigured, AI_MODEL } from "./client";
 import { ADVISOR_SYSTEM_INSTRUCTION, buildAdvisorUserMessage } from "./advisor-prompt";
 import { retrieveContext, retrievedProgramIds } from "./retrieval";
 import { AdvisorAnalysisSchema, type AdvisorAnalysis } from "./advisor-schema";
+import { classifyGeminiError, logGeminiFailure, type AiFailureReason } from "./errors";
 
-export type AdvisorFailureReason =
-  | "not_configured"
-  | "invalid_key"
-  | "rate_limited"
-  | "api_error"
-  | "malformed_response"
-  | "network_error";
+export type AdvisorFailureReason = AiFailureReason;
 
 export interface AdvisorSource {
   programId: string;
@@ -67,14 +62,6 @@ function buildResponseSchema(allowedProgramIds: string[]): Schema {
     },
     required: ["summary"],
   };
-}
-
-function classifyError(error: unknown): AdvisorFailureReason {
-  const status = (error as { status?: unknown } | null)?.status;
-  if (status === 401 || status === 403) return "invalid_key";
-  if (status === 429) return "rate_limited";
-  if (typeof status === "number") return "api_error";
-  return "network_error";
 }
 
 /**
@@ -186,11 +173,8 @@ export async function generateAdvisorAnalysis(params: {
       },
     };
   } catch (error) {
-    const reason = classifyError(error);
-    const status = (error as { status?: unknown } | null)?.status;
-    const message = (error as { message?: unknown } | null)?.message;
-    // Safe to log: Gemini's own error status/message, never the API key or student data.
-    console.error(`[advisor] gemini call failed: ${reason} (status=${status ?? "n/a"}) ${typeof message === "string" ? message.slice(0, 300) : ""}`);
+    const reason = classifyGeminiError(error);
+    logGeminiFailure("advisor", reason, error);
     return { ok: false, reason };
   }
 }
