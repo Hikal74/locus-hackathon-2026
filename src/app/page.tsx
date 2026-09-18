@@ -38,7 +38,9 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/profile">
-              <Button size="lg">Build my path</Button>
+              <Button size="lg" className="bg-pink-500 text-white border-pink-500 hover:bg-pink-600 hover:border-pink-600">
+                Build my path
+              </Button>
             </Link>
             <ExampleButton />
           </div>
