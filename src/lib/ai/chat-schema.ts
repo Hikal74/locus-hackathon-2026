@@ -1,7 +1,14 @@
 import { z } from "zod";
 import { StudentProfileRequestSchema } from "./advisor-schema";
 
-const MAX_MESSAGE_LENGTH = 2000;
+// Bounds a single turn's length. User-typed questions are always short, but this also
+// has to cover Gemini's own replies echoed back as history on the next turn — those are
+// capped at maxOutputTokens: 1024 server-side (chat.ts), which can produce several
+// thousand characters of English prose, so this needs real headroom above 1024 tokens'
+// worth of characters, not just "long enough for a typed question." A cap that's too
+// tight here causes every future turn in the conversation to 400 once one reply crosses
+// it, since the full history is resent each turn — a real bug this was fixed after hitting.
+const MAX_MESSAGE_LENGTH = 8000;
 const MAX_MESSAGES = 30;
 
 const ChatMessageSchema = z.object({

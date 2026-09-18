@@ -22,6 +22,9 @@ type ChatStatus = "idle" | "loading" | "error";
 
 const NO_MESSAGES: ChatMessage[] = [];
 
+/** Bounds how much history is ever sent to the server, regardless of how long the localStorage-persisted conversation grows. */
+const MAX_MESSAGES_SENT = 20;
+
 function makeId(): string {
   return typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
@@ -56,7 +59,7 @@ export function useChatAdvisor(profile: StudentProfile | null, weights?: Record<
           body: JSON.stringify({
             profile,
             weights,
-            messages: list.map(({ role, content }) => ({ role, content })),
+            messages: list.slice(-MAX_MESSAGES_SENT).map(({ role, content }) => ({ role, content })),
           }),
         });
 
