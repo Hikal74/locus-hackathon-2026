@@ -115,9 +115,10 @@ Pathlight turns a student's field, country, budget, and constraints into a ranke
 ## 11. Status
 
 **Built and verified:**
-- Full journey: Landing → Profile → Diagnosis → Match (method picker) → [Duels | Rank | Fit Map | Interview] → Recommendations → Comparison → Roadmap → Saved programs.
+- Full journey: Landing → Profile → Diagnosis → Match (method picker) → [Duels | Rank | Fit Map | Interview] → Recommendations → Comparison → Roadmap (a branching metro-map diagram, not a flat checklist) → Saved programs.
 - Deterministic recommendation engine with documented default weights, hard constraints, an optional personalized weight vector, and an automated test suite.
 - Four selectable matching methods, each producing a personalized weight vector fed into the same engine — see `docs/RECOMMENDATION_ENGINE.md` §2.5.
+- A branching metro-map roadmap: 4 parallel, deterministic tracks (Academic Prep, Portfolio & Achievements, Documents & Funding, Applications & Essays) converging on a "Dream Portfolio" terminus — hand-rolled SVG, lines distinguished by stroke pattern not color, click-to-expand stations, no AI involved in deciding what's on it.
 - A global AI advisor drawer, reachable from every page, with a freeform Chat tab (persisted across reloads) and the original structured Full Analysis tab.
 - What-If scenario mode with live recompute.
 - Data trust system wired end-to-end, now with a non-color (icon + border pattern) encoding for the monochrome design.

@@ -1,4 +1,5 @@
 import type { StudentProfile } from "@/lib/data/types";
+import { FIELD_LABELS } from "@/lib/data/labels";
 import type { Recommendation } from "./types";
 
 export type RoadmapCategory =
@@ -8,7 +9,8 @@ export type RoadmapCategory =
   | "applications"
   | "scholarships"
   | "essays"
-  | "recommendation_letters";
+  | "recommendation_letters"
+  | "portfolio";
 
 export type RoadmapPriority = "now" | "next" | "later";
 
@@ -99,6 +101,59 @@ export function buildRoadmap(profile: StudentProfile, recommendations: Recommend
   return tasks.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
 }
 
+/**
+ * Fixed, field-tailored portfolio-building activities — deliberately NOT derived
+ * from an AI reading of the student's free text. There's no structured signal in
+ * the profile for "have you built a project," so unlike buildRoadmap's gap-derived
+ * tasks, these are always the same 5 aspirational activities with the field name
+ * substituted in, never claiming more personalization than that. The one exception
+ * is the research task's reason, which reads the student's own stated preference
+ * (a structured boolean field, not free-text parsing) rather than inventing one.
+ */
+export function buildPortfolioTasks(profile: StudentProfile): RoadmapTask[] {
+  const field = FIELD_LABELS[profile.intendedField];
+
+  return [
+    {
+      id: "portfolio-project",
+      title: `Build a project in ${field}`,
+      category: "portfolio",
+      priority: "next",
+      reason: "A real, finished project is the single most concrete thing admissions readers can point to.",
+    },
+    {
+      id: "portfolio-competition",
+      title: `Enter a competition or olympiad related to ${field}`,
+      category: "portfolio",
+      priority: "next",
+      reason: "External recognition is hard to fake — it's evidence, not a claim.",
+    },
+    {
+      id: "portfolio-research",
+      title: `Find a research, mentorship, or shadowing opportunity in ${field}`,
+      category: "portfolio",
+      priority: "next",
+      reason: profile.preferences.prioritizeResearch
+        ? "You said research opportunities matter to you — this is how you build a track record toward that, not just look for it in a program."
+        : "Even informal exposure (a mentor, a shadowing week) gives you something specific to talk about.",
+    },
+    {
+      id: "portfolio-leadership",
+      title: "Take on a leadership role — a club, team, or volunteer effort",
+      category: "portfolio",
+      priority: "next",
+      reason: "Shows initiative and follow-through outside the classroom, over time — not a one-off.",
+    },
+    {
+      id: "portfolio-showcase",
+      title: "Put your work together somewhere you can point to (portfolio site, GitHub, exhibition)",
+      category: "portfolio",
+      priority: "next",
+      reason: "Scattered achievements are easy to undersell — one place that shows all of it isn't.",
+    },
+  ];
+}
+
 export interface ReadinessBucket {
   label: string;
   value: number;
@@ -106,6 +161,7 @@ export interface ReadinessBucket {
 
 const BUCKET_CATEGORIES: { label: string; categories: RoadmapCategory[] }[] = [
   { label: "Academic preparation", categories: ["academic", "exams"] },
+  { label: "Portfolio & achievements", categories: ["portfolio"] },
   { label: "Documents & funding", categories: ["documents", "scholarships"] },
   { label: "Applications & essays", categories: ["applications", "essays", "recommendation_letters"] },
 ];

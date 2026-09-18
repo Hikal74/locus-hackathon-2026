@@ -59,7 +59,7 @@ On the Recommendations page, changing budget or toggling a country updates a loc
 ## Downstream consumers
 
 - **Diagnosis** (`diagnosis.ts`) does not call the recommendation engine — it's a separate, simpler read of the raw profile (strengths/constraints/gaps/readiness), shown before recommendations exist conceptually.
-- **Roadmap** (`roadmap.ts`) calls `getRecommendations` itself and builds tasks from the **top 3** matches' `watchOut` gaps and deadlines — deliberately not the full shortlist, to keep the task list short per the case brief's "one clear next action, not fifty tasks" requirement.
+- **Roadmap** (`roadmap.ts`) calls `getRecommendations` itself and builds tasks from the **top 3** matches' `watchOut` gaps and deadlines — deliberately not the full shortlist, to keep the task list short per the case brief's "one clear next action, not fifty tasks" requirement. `buildPortfolioTasks(profile)` adds a fixed, field-tailored set of portfolio-building activities alongside it (no engine/AI involvement — same 5 activities for everyone in that field, see `docs/ARCHITECTURE.md`). `metro.ts`'s `buildMetroMap()` then regroups the combined task list into 4 parallel lines (Academic Prep, Portfolio & Achievements, Documents & Funding, Applications & Essays) for the `/roadmap` page's metro-map diagram — a pure presentation transform, no new task-generation logic of its own.
 - **Compare** re-runs `getRecommendations` against the full stored profile and filters to the selected program ids from the URL query string, rather than passing recommendation objects through navigation state.
 
 ## Known limitations of the current algorithm

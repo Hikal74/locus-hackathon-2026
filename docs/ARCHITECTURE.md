@@ -63,7 +63,9 @@ The recommendation/diagnosis/roadmap logic never leaves the browser and never ca
 src/
   lib/
     data/       Core types, the dataset, the judge-mode sample profile, field labels.
-    engine/     Recommendation scoring, explanation text, diagnosis, roadmap generation,
+    engine/     Recommendation scoring, explanation text, diagnosis, roadmap generation
+                (roadmap.ts, incl. buildPortfolioTasks — fixed, field-tailored portfolio
+                activities), metro.ts (groups roadmap tasks into the 4 metro-map lines),
                 plus personalize.ts (weight-vector math shared by all 4 /match methods)
                 and duels.ts (head-to-head pair generation). Pure functions — see
                 docs/RECOMMENDATION_ENGINE.md. Unit-tested (src/lib/engine/*.test.ts).
@@ -86,6 +88,9 @@ src/
     layout/     NavBar, RequireProfile (the auth-less "you need a profile" gate).
     landing/    Judge-mode entry point.
     recommendations/  RecommendationCard (fit score, why-it-fits, save/compare toggles).
+    roadmap/    MetroMap — hand-rolled inline SVG diagram (no charting library) rendering
+                the roadmap as 4 parallel lines converging on a "Dream Portfolio" terminus,
+                lines distinguished by stroke pattern (not color), click-to-expand stations.
     advisor/    AdvisorLauncher + AdvisorDrawer (global, mounted at the root layout,
                 reachable from every route) with two tabs: Chat (freeform, /api/chat)
                 and Full analysis (the structured advisor, AdvisorPanel.tsx, unchanged
@@ -103,7 +108,9 @@ src/
     recommendations/page.tsx  Ranked list, What-If controls, save/compare, opens the
                                drawer's Full analysis tab (no longer embeds it inline)
     compare/page.tsx           Side-by-side table
-    roadmap/page.tsx            Next action, readiness, Now/Next/Later tasks
+    roadmap/page.tsx            Next action + the MetroMap: 4 parallel lines (Academic
+                                 Prep, Portfolio & Achievements, Documents & Funding,
+                                 Applications & Essays) converging on Dream Portfolio
     saved/page.tsx               Bookmarked programs
     api/explain/route.ts          Rephrasing server endpoint
     api/advisor/route.ts           Structured AI advisor server endpoint
