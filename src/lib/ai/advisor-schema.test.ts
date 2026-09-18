@@ -60,6 +60,32 @@ describe("AdvisorRequestSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  /**
+   * Regression test: the assistant side of a history turn is a prior
+   * response's `summary` field (see use-advisor.ts), which AdvisorAnalysisSchema
+   * leaves uncapped -- a real "comprehensive analysis" summary from Gemini
+   * routinely runs past a couple thousand characters. Too tight a cap here
+   * means the first follow-up question after a real analysis 400s, and stays
+   * broken for every later follow-up too, since the same history is resent
+   * each time. Same bug class as chat-schema.test.ts's long-message case.
+   */
+  it("accepts a long assistant summary in history, within the raised per-turn cap", () => {
+    const result = AdvisorRequestSchema.safeParse({
+      profile: testProfile,
+      question: "What about China instead?",
+      history: [{ role: "assistant", content: "x".repeat(6000) }],
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("still rejects a history turn beyond the per-turn cap", () => {
+    const result = AdvisorRequestSchema.safeParse({
+      profile: testProfile,
+      history: [{ role: "assistant", content: "x".repeat(8001) }],
+    });
+    expect(result.success).toBe(false);
+  });
+
   it("accepts a profile with empty arrays/no optional fields (a mostly-blank form)", () => {
     const minimal = {
       intendedField: "computer_science",

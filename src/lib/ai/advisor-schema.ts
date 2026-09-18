@@ -11,7 +11,14 @@ import { z } from "zod";
 
 const MAX_FREE_TEXT = 4000;
 const MAX_HISTORY_TURNS = 8;
-const MAX_HISTORY_TURN_LENGTH = 2000;
+// The assistant side of a history turn is the prior response's `summary` field
+// (see use-advisor.ts), which AdvisorAnalysisSchema below leaves uncapped —
+// Gemini's own "comprehensive analysis" summaries routinely run well past
+// 2000 characters. Too tight a cap here means the first follow-up question
+// after a real analysis 400s, and stays broken for every later follow-up too,
+// since the same history keeps getting resent. Mirrors the identical fix
+// applied to chat-schema.ts's MAX_MESSAGE_LENGTH.
+const MAX_HISTORY_TURN_LENGTH = 8000;
 const MAX_QUESTION_LENGTH = 1000;
 
 const FieldOfStudySchema = z.enum([
