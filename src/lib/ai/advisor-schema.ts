@@ -38,7 +38,19 @@ export const StudentProfileRequestSchema = z.object({
   grade: z.string().max(100).optional(),
   intendedField: FieldOfStudySchema,
   interests: z.array(z.string().max(100)).max(30),
-  gpaOn4Scale: z.number().min(0).max(4).optional(),
+  // Clamped, not rejected: the profile form labels this "4.0 scale," but
+  // nothing before this schema enforced that (an HTML `max` attribute alone
+  // doesn't stop a typed value from exceeding it), and this dataset's own
+  // Kazakhstan universities are a real case where a student's actual GPA
+  // often isn't natively on a 4.0 scale. A single out-of-range legacy value
+  // shouldn't 400 the entire AI advisor for every unrelated question — see
+  // the real report this fixed: a stored profile with gpaOn4Scale > 4 broke
+  // every /api/chat and /api/advisor request, including "what is Pathlight?"
+  gpaOn4Scale: z
+    .number()
+    .finite()
+    .transform((v) => Math.min(4, Math.max(0, v)))
+    .optional(),
   relevantSubjects: z.array(z.string().max(100)).max(30),
   countryPreferences: z.array(CountrySchema).max(10),
   // No upper cap: the What-If budget input (src/app/recommendations/page.tsx)

@@ -30,8 +30,27 @@ describe("AdvisorRequestSchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects a GPA outside the 0-4 range", () => {
-    const result = AdvisorRequestSchema.safeParse({ profile: { ...testProfile, gpaOn4Scale: 9.9 } });
+  /**
+   * Regression test for a real live bug report: a stored profile with
+   * gpaOn4Scale above 4 (e.g. a non-4.0-scale GPA, like Kazakhstan commonly
+   * uses) 400'd every AI advisor request for that student, including
+   * completely unrelated questions like "what is Pathlight?" — because the
+   * whole request was rejected instead of just clamping the one bad field.
+   */
+  it("clamps an above-range GPA to 4 rather than rejecting the whole request", () => {
+    const result = AdvisorRequestSchema.safeParse({ profile: { ...testProfile, gpaOn4Scale: 4.8 } });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.profile.gpaOn4Scale).toBe(4);
+  });
+
+  it("clamps a below-range GPA to 0 rather than rejecting the whole request", () => {
+    const result = AdvisorRequestSchema.safeParse({ profile: { ...testProfile, gpaOn4Scale: -1 } });
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.data.profile.gpaOn4Scale).toBe(0);
+  });
+
+  it("still rejects a non-finite GPA (NaN/Infinity)", () => {
+    const result = AdvisorRequestSchema.safeParse({ profile: { ...testProfile, gpaOn4Scale: Infinity } });
     expect(result.success).toBe(false);
   });
 

@@ -108,7 +108,12 @@ export default function ProfilePage() {
       languageLevel,
       examsCompleted: draft.examsCompleted,
       intendedIntake: draft.intendedIntake || "Fall 2027",
-      gpaOn4Scale: draft.gpaOn4Scale.trim() ? Number(draft.gpaOn4Scale) : undefined,
+      // Clamped, not just hinted via the input's HTML `max` attribute (which
+      // doesn't actually stop a value like 4.8 or 85 from being typed and
+      // saved) — a GPA outside 0-4 broke every AI advisor request for the
+      // student who ran into this, since the request schema rejected the
+      // whole request rather than just this one field.
+      gpaOn4Scale: draft.gpaOn4Scale.trim() ? Math.min(4, Math.max(0, Number(draft.gpaOn4Scale))) : undefined,
       preferences: {
         prioritizeResearch: draft.prioritizeResearch,
         prioritizeScholarship: draft.prioritizeScholarship,
