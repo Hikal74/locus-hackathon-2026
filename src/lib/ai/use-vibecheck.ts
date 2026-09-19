@@ -54,11 +54,5 @@ export function useVibeCheck() {
     if (lastInput) void run(lastInput);
   }, [lastInput, run]);
 
-  const reset = useCallback(() => {
-    setResult(null);
-    setStatus("idle");
-    setErrorMessage(null);
-  }, []);
-
-  return { result, status, errorMessage, check: run, retry, reset };
+  return { result, status, errorMessage, check: run, retry };
 }

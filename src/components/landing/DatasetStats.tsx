@@ -11,7 +11,7 @@ export function DatasetStats() {
   ];
 
   return (
-    <Card padding="none" className="mt-8 overflow-hidden">
+    <Card padding="none" className="overflow-hidden">
       <dl className="grid grid-cols-2 divide-x divide-y divide-line-soft sm:grid-cols-4 sm:divide-y-0">
         {stats.map((s) => (
           <div key={s.label} className="flex flex-col items-center gap-0.5 px-4 py-4 text-center">

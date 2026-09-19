@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/Badge";
 import { DotMeter } from "@/components/ui/DotMeter";
 import { WarningIcon } from "@/components/ui/icons";
-import { cn } from "@/lib/utils/cn";
 import type { VibeCheckResult, VibeLevel, VibeTraitKey } from "@/lib/ai/vibecheck-schema";
 
 const TRAITS: Record<VibeTraitKey, { label: string; words: Record<Exclude<VibeLevel, "unclear">, string> }> = {
@@ -18,19 +17,19 @@ const LEVEL_DOTS: Record<Exclude<VibeLevel, "unclear">, number> = { high: 3, med
 const CONFIDENCE_LABEL = { low: "Low confidence", medium: "Medium confidence", high: "High confidence" } as const;
 
 /** Every trait shows the evidence behind it — a rating with no visible reason isn't trustworthy. */
-export function VibeResult({ result, compact = false }: { result: VibeCheckResult; compact?: boolean }) {
+export function VibeResult({ result }: { result: VibeCheckResult }) {
   const order = Object.keys(TRAITS) as VibeTraitKey[];
   const byKey = new Map(result.traits.map((t) => [t.key, t]));
 
   return (
-    <div className={cn("flex flex-col", compact ? "gap-3" : "gap-5")}>
+    <div className="flex flex-col gap-5">
       <div>
         <div className="flex flex-wrap items-center gap-2">
           <Badge tone={result.confidence === "high" ? "primary" : result.confidence === "medium" ? "accent" : "warning"}>
             {CONFIDENCE_LABEL[result.confidence]}
           </Badge>
         </div>
-        <h2 className={cn("mt-2 font-semibold text-ink", compact ? "text-lg" : "text-2xl")}>{result.headline}</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-ink">{result.headline}</h2>
       </div>
 
       <ul className="flex flex-col divide-y divide-line-soft">

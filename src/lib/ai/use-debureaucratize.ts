@@ -48,11 +48,5 @@ export function useDebureaucratize() {
     if (lastText) void run(lastText);
   }, [lastText, run]);
 
-  const reset = useCallback(() => {
-    setResult(null);
-    setStatus("idle");
-    setErrorMessage(null);
-  }, []);
-
-  return { result, status, errorMessage, translate: run, retry, reset };
+  return { result, status, errorMessage, translate: run, retry };
 }
