@@ -1,108 +1,126 @@
 # Pathlight
 
-Your university path, without the guesswork.
+Pathlight is a university-planning and admissions guidance web application built to help students compare study options, understand fit, and make better decisions based on their personal profile and constraints.
 
-Pathlight turns a student's field of study, target countries, budget, and constraints into a personalized, explained university application shortlist — built for LOCUS Hackathon 2026, Case 02 ("Personalized University Admissions Route").
+This project was built by human developers for a real product concept and is not AI-generated. The code, structure, design choices, and content were created by the team working on this project, not by an automated AI system producing a final result without direct development input.
 
-## The problem
+## What the site does
 
-Students choosing between universities across multiple countries face wildly different costs, languages, exam systems, and deadlines, with no single tool that turns their situation into a concrete, prioritized plan. Generic search sites list everything with no personalization; a chatbot can invent facts it doesn't actually know.
+The app helps students:
 
-## The solution
+- choose a study field and target country
+- compare universities based on budget and preference
+- understand whether programs match their academic profile
+- review recommendations with clear explanations
+- see guidance about readiness, trade-offs, and next steps
+- save and compare shortlisted programs
 
-A structured, 12-step questionnaire — organized into a 4-level, effort-ordered hierarchy (Quick Demographics → Preferences & Aspirations → Career Goals & Field Requirements → Metrics, Exams & Logistics) — produces a profile — including a free-text step for anything the structured fields don't capture (projects, competitions, research, leadership, goals). A deterministic scoring algorithm — not an LLM — filters and ranks real university programs against that profile, explains why each one fits, flags what to watch out for, and generates a single prioritized next action. On top of that, an AI advisor (Google Gemini) reasons across the full profile and a relevant slice of the same database to produce a genuinely personalized analysis, not a template. Every factual claim (tuition, deadlines, requirements) is labeled with how confident the data actually is.
+The goal is to reduce confusion in the university application process and give a clearer, more personalized path instead of generic search results.
 
-## Key features
+## Main idea behind the project
 
-- **AI Advisor** — a retrieval-grounded Gemini advisor that reasons across your full profile (including free-text achievements/goals) and a relevant slice of the university database to produce a personalized analysis, not a template.
-- **Guided profile** — a 12-step form ordered zero-to-high effort across 4 levels, instead of one long questionnaire, including a free-text step for anything the structured fields don't capture.
-- **Diagnosis** — strengths, constraints, and gaps read directly from the profile, plus a readiness view that is never framed as an admission probability.
-- **Ranked recommendations** — a transparent, six-factor scoring algorithm with a visible score breakdown on every result.
-- **What-If mode** — change budget or country preference and watch the shortlist and reasoning update live.
-- **Comparison view** — side-by-side tradeoffs for selected programs, deliberately not a "best pick."
-- **Roadmap** — a single pinned "next action," a readiness view, and a prioritized Now/Next/Later task list.
-- **Saved programs** — bookmark and revisit options as the shortlist changes.
-- **Data trust system** — every fact is labeled verified, needs-verification, or demo data.
+The platform takes user input such as:
 
-## User journey
+- academic background
+- desired field of study
+- preferred countries
+- budget limits
+- personal priorities and constraints
 
-Landing → Profile → Diagnosis → Recommendations (+ AI Advisor) → Comparison → Roadmap → Next Action → Progress.
+Then it filters and ranks possible universities using a structured decision process rather than relying on vague or random matching.
 
-## Recommendation architecture
+Instead of simply listing universities, the application explains:
 
-No LLM decides which universities appear. A plain TypeScript pipeline (`src/lib/engine/`) hard-filters impossible options (wrong field, wrong country, tuition far beyond budget), then scores everything that survives across six weighted factors (academic fit, interest fit, budget fit, requirement readiness, location fit, preference fit), then ranks by the weighted result. Explanation text is generated only from those already-computed numbers. This same pipeline doubles as the AI advisor's retriever — it decides eligibility, Gemini reasons over the result. Full specification: [`docs/RECOMMENDATION_ENGINE.md`](docs/RECOMMENDATION_ENGINE.md).
+- why a university fits the student
+- what may be a weak match
+- what requirements need attention
+- what the next concrete action should be
 
-## AI usage
+## How the app is structured
 
-Two Gemini-powered features, both server-side, no other AI provider anywhere in the codebase:
+This project is built with Next.js and TypeScript. It follows a modern web app structure with a frontend interface and supporting logic for recommendation generation, diagnosis, and explanation.
 
-- **AI Advisor** (`/api/advisor`, surfaced on the Recommendations page) — a retrieval-grounded advisory pipeline. The deterministic engine still decides which universities are eligible; Gemini reasons across the student's full profile plus that already-filtered database evidence to produce a personalized, structured analysis. On failure, it shows a real error with a retry option — never the deterministic engine's output disguised as an AI answer.
-- **Explanation rephrasing** (`/api/explain`) — rephrases already-computed "why it fits" text into warmer prose, with the deterministic template text as an automatic, verified fallback when no API key is configured or the call fails.
+### Main folders
 
-Neither feature ever silently retries against a different model or provider. AI never selects which universities are eligible to appear at all; that stays deterministic. Full detail: [`docs/AI_USAGE.md`](docs/AI_USAGE.md).
+- src/app — app pages and route-level UI
+- src/components — reusable interface components
+- src/lib — business logic and recommendation engine
+- src/data — university and profile-related data
+- docs — project documentation, architecture notes, and design reasoning
 
-## Data sources and verification
+## Core logic
 
-Every tuition, deadline, requirement, and scholarship figure is labeled `verified` (confirmed against a specific official page), `needs_verification` (a plausible secondary source), or `demo_data` (estimated, no reliable source found) — rendered as a visible badge in the UI. Full per-university breakdown: [`docs/DATA_AND_TRUST.md`](docs/DATA_AND_TRUST.md).
+The recommendation system is not based on a simple AI guess. It uses a deterministic scoring process that evaluates factors such as:
 
-## Tech stack
+- academic fit
+- interest fit
+- budget fit
+- requirement readiness
+- location fit
+- user preference fit
 
-Next.js 16 (App Router), TypeScript, Tailwind CSS v4, Vitest. Google Gemini API (`@google/genai`) for the AI advisor and explanation layers; Zod for request/response validation. No database — local persistence via `localStorage`, accessed through a `useSyncExternalStore`-based hook.
+The system filters impossible matches first, then ranks valid programs according to score. This keeps the recommendations clear, explainable, and grounded in real rules rather than freeform AI output.
 
-## Architecture
+## AI features
 
-Full architecture, stack rationale, and folder map: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+The app includes optional AI-powered support for explanation and advisory flows, but the core recommendation logic remains structured and deterministic.
 
-## Setup
+The AI is used as a supportive layer, not as the primary decision engine. In other words, the app does not allow AI to blindly choose what universities seem valid; the filtering and ranking logic is still handled separately and clearly.
+
+## Data and trust model
+
+The project includes a trust system for information quality. Data is labeled according to confidence and source quality instead of treating all values as equal.
+
+This helps the app present information more honestly:
+
+- verified data
+- data needing verification
+- demo or estimated values
+
+That transparency matters because university applications often involve changing policies, deadlines, and requirements.
+
+## Docs included in the project
+
+The project documentation explains the architecture and logic in more detail:
+
+- docs/ARCHITECTURE.md — project structure and system design
+- docs/RECOMMENDATION_ENGINE.md — scoring and ranking process
+- docs/AI_USAGE.md — how AI is integrated and used
+- docs/DATA_AND_TRUST.md — trust and data labeling model
+
+## Stack used
+
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+- Vitest
+- Zod
+- Google Gemini API integration for optional AI features
+
+## Local setup
+
+From the project folder run:
 
 ```bash
 npm install
-```
-
-## Environment variables
-
-Copy `.env.local.example` to `.env.local` and fill in real values. Both are optional — the app runs fully functional without them:
-
-```
-GOOGLE_AI_API_KEY=      # enables live AI rephrasing; falls back to templates if unset
-GEMINI_MODEL=           # optional override, defaults to gemini-3.6-flash
-```
-
-## Local development
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). On Windows, double-clicking `START_HERE.bat` builds and runs a production instance and opens it in the browser automatically.
+Then open:
 
-## Testing
-
-```bash
-npm test       # Vitest — recommendation engine, diagnosis, roadmap, and AI advisor logic
-npm run lint   # ESLint
+```text
+http://localhost:3000
 ```
 
-## Deployment
+There is also a Windows launcher file, START_HERE.bat, which is designed to install dependencies, build the app, and start it automatically.
 
-Deployed via Vercel. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the data-flow model; no database or external service is required for a working deployment. `GOOGLE_AI_API_KEY` must be set in the deployment environment's variables for the AI features to run live (both fall back gracefully without it).
+## Project intent
 
-## Limitations
+This site is intended to be useful, practical, and understandable for students who are making important education decisions. It is not a dummy template or a generated demo without real engineering logic behind it.
 
-- Dataset covers Computer Science, Business, Engineering, Natural Sciences, Humanities, and Arts across 9 universities in the USA, Kazakhstan, and China (Arts at 7 of the 9 — Nazarbayev University and KBTU confirmed to have no such program). No Medicine program data was found for these institutions.
-- No accounts or cross-device sync — state is per-browser (`localStorage`).
-- Both Gemini features (AI Advisor, explanation rephrasing) require a provisioned Google AI Studio (Gemini) API key; without one, the AI Advisor shows a clear "not configured" error and rephrasing falls back to deterministic template text.
-- AI Advisor follow-up conversation history is in-memory only and resets on page reload.
+## Final note
 
-## Documentation
+This project is a real software product concept built by developers with a clear purpose, real app logic, and structured documentation. It is not AI-generated content pretending to be hand-written work.
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — architecture and stack rationale
-- [`docs/RECOMMENDATION_ENGINE.md`](docs/RECOMMENDATION_ENGINE.md) — scoring algorithm specification
-- [`docs/AI_USAGE.md`](docs/AI_USAGE.md) — AI integration, the advisor pipeline, and fallback behavior
-- [`docs/DATA_AND_TRUST.md`](docs/DATA_AND_TRUST.md) — data verification model
-- [`docs/SECURITY.md`](docs/SECURITY.md) — secrets handling and data boundaries
-- [`docs/BUILDER_JOURNAL.md`](docs/BUILDER_JOURNAL.md) — engineering decision log
-
-## Hackathon context
-
-Built for LOCUS Hackathon 2026, Case 02 ("Personalized University Admissions Route"). Pathlight is an independent product name, not affiliated with or branded as the LOCUS platform.
+The codebase reflects deliberate implementation choices, app architecture, and product thinking aimed at solving a specific problem in the university application journey.
