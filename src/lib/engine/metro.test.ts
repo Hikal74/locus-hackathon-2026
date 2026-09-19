@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildMetroMap, computeLineProgress, findNextMicrotask, isMapComplete, isStationDone } from "./metro";
+import { buildMetroMap, computeLineProgress, findNextMicrotask, isMapComplete, isStationDone, wrapStationLabel } from "./metro";
 import type { RoadmapTask } from "./roadmap";
 
 const tasks: RoadmapTask[] = [
@@ -100,5 +100,35 @@ describe("findNextMicrotask", () => {
     const allInAcademicLine = map.lines.find((l) => l.id === "academic")!.stations.flatMap((s) => s.microtasks.map((m) => m.id));
     const next = findNextMicrotask(map, allInAcademicLine);
     expect(next?.station.id).not.toBe("gap-0");
+  });
+});
+
+describe("wrapStationLabel", () => {
+  it("keeps a short title on one line", () => {
+    expect(wrapStationLabel("Take the test")).toEqual(["Take the", "test"]);
+    expect(wrapStationLabel("Register")).toEqual(["Register"]);
+  });
+
+  it("wraps on word boundaries without exceeding the line width", () => {
+    const lines = wrapStationLabel("Gather official transcripts", 12, 2);
+    expect(lines).toEqual(["Gather", "official…"]);
+    for (const l of lines) expect(l.length).toBeLessThanOrEqual(12);
+  });
+
+  it("ends the last line with an ellipsis when the title is too long", () => {
+    const lines = wrapStationLabel("Submit application to Nazarbayev University", 12, 2);
+    expect(lines).toHaveLength(2);
+    expect(lines[1].endsWith("…")).toBe(true);
+    for (const l of lines) expect(l.length).toBeLessThanOrEqual(12);
+  });
+
+  it("clips a single word longer than the line", () => {
+    const lines = wrapStationLabel("Internationalization", 12, 2);
+    expect(lines).toEqual(["Internation…"]);
+  });
+
+  it("never returns more lines than allowed, and returns nothing for an empty title", () => {
+    expect(wrapStationLabel("a b c d e f g h i j k l m n o p", 4, 2).length).toBeLessThanOrEqual(2);
+    expect(wrapStationLabel("   ")).toEqual([]);
   });
 });

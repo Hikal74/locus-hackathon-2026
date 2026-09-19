@@ -105,3 +105,28 @@ export function findNextMicrotask(map: MetroMap, completedIds: string[]): { stat
   }
   return null;
 }
+
+/**
+ * Wraps a station title into at most `maxLines` short lines for the map's SVG labels (SVG text doesn't wrap
+ * itself, and stations sit only ~78px apart). Words are kept whole where possible; whatever doesn't fit ends
+ * in an ellipsis — the full title stays available via the tooltip and aria-label.
+ */
+export function wrapStationLabel(title: string, maxChars = 12, maxLines = 2): string[] {
+  const clip = (word: string) => (word.length > maxChars ? `${word.slice(0, maxChars - 1)}…` : word);
+  const ellipsize = (text: string) => (text.length + 1 <= maxChars ? `${text}…` : `${text.slice(0, maxChars - 1)}…`);
+
+  const words = title.trim().split(/\s+/).filter(Boolean).map(clip);
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word;
+    if (candidate.length <= maxChars) {
+      current = candidate;
+      continue;
+    }
+    if (lines.length + 1 >= maxLines) return [...lines, ellipsize(current)];
+    lines.push(current);
+    current = word;
+  }
+  return current ? [...lines, current] : lines;
+}

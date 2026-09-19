@@ -10,7 +10,7 @@ export function CampusLifeDetails({ campusLife }: { campusLife?: CampusLife }) {
     <div className="flex flex-col gap-3 text-sm">
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-medium text-ink-soft">Cost of living:</span>
-        <span className="text-ink-soft">~${costOfLivingPerMonthUSD.value.toLocaleString()}/month</span>
+        <span className="text-ink-soft">~${costOfLivingPerMonthUSD.value.toLocaleString("en-US")}/month</span>
         <VerificationBadge status={costOfLivingPerMonthUSD.status} />
         <span className="text-xs text-ink-faint">(excludes tuition)</span>
       </div>
@@ -22,8 +22,8 @@ export function CampusLifeDetails({ campusLife }: { campusLife?: CampusLife }) {
             {onCampusHousing.priceRangePerYearUSD ? (
               <>
                 <span className="text-ink-soft">
-                  ${onCampusHousing.priceRangePerYearUSD.value[0].toLocaleString()}–$
-                  {onCampusHousing.priceRangePerYearUSD.value[1].toLocaleString()}/yr
+                  ${onCampusHousing.priceRangePerYearUSD.value[0].toLocaleString("en-US")}–$
+                  {onCampusHousing.priceRangePerYearUSD.value[1].toLocaleString("en-US")}/yr
                 </span>
                 <VerificationBadge status={onCampusHousing.priceRangePerYearUSD.status} />
               </>

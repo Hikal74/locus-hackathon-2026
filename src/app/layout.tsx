@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import "./globals.css";
 import { ProfileProvider } from "@/lib/store/profile-context";
 import { NavBar } from "@/components/layout/NavBar";
+import { Footer } from "@/components/layout/Footer";
 import { AdvisorUiProvider } from "@/components/advisor/advisor-context";
 import { AdvisorLauncher } from "@/components/advisor/AdvisorLauncher";
 import { AdvisorDrawer } from "@/components/advisor/AdvisorDrawer";
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <AdvisorUiProvider>
             <NavBar />
             <main className="flex-1">{children}</main>
+            <Footer />
             <AdvisorLauncher />
             <AdvisorDrawer />
           </AdvisorUiProvider>

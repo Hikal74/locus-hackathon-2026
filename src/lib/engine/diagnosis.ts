@@ -54,7 +54,7 @@ export function buildDiagnosis(profile: StudentProfile): Diagnosis {
 
   const goal = `${FIELD_LABELS[profile.intendedField]} at the bachelor's level, starting ${profile.intendedIntake}, in ${profile.countryPreferences.join(
     " or "
-  )}${profile.budgetPerYearUSD ? `, within about $${profile.budgetPerYearUSD.toLocaleString()}/year` : ""}.`;
+  )}${profile.budgetPerYearUSD ? `, within about $${profile.budgetPerYearUSD.toLocaleString("en-US")}/year` : ""}.`;
 
   return { goal, strengths, constraints, gaps };
 }

@@ -48,9 +48,28 @@ const verificationConfig: Record<
   demo_data: { label: "Demo data", tone: "neutral", icon: <ClockIcon width={12} height={12} /> },
 };
 
-/** Trust indicator required by docs/DATA_AND_TRUST.md — never render a fact without one. */
-export function VerificationBadge({ status }: { status: VerificationStatus }) {
+const compactLabel: Record<VerificationStatus, string> = {
+  verified: "Verified",
+  needs_verification: "To verify",
+  demo_data: "Demo",
+};
+
+/**
+ * Trust indicator required by docs/DATA_AND_TRUST.md — never render a fact without one.
+ * `compact` shortens the label for dense stat grids; the full wording stays in the tooltip.
+ */
+export function VerificationBadge({ status, compact = false }: { status: VerificationStatus; compact?: boolean }) {
   const config = verificationConfig[status];
+  if (compact) {
+    return (
+      <span title={config.label} className="inline-flex">
+        <Badge tone={config.tone} className="gap-1 px-2 py-0.5 text-[11px]">
+          {config.icon}
+          {compactLabel[status]}
+        </Badge>
+      </span>
+    );
+  }
   return (
     <Badge tone={config.tone}>
       {config.icon}

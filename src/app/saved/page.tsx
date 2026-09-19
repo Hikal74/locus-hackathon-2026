@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
-import { WarningIcon } from "@/components/ui/icons";
+import { HeartIcon, WarningIcon } from "@/components/ui/icons";
 import { RecommendationCard } from "@/components/recommendations/RecommendationCard";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { RequireProfile } from "@/components/layout/RequireProfile";
 import { useSavedPrograms } from "@/lib/store/saved-programs";
 import { useMatchWeights } from "@/lib/store/match-weights";
@@ -22,21 +24,37 @@ function SavedBody({ profile }: { profile: StudentProfile }) {
 
   if (savedIds.length === 0) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <p className="text-ink-soft">You haven&apos;t saved any programs yet.</p>
-        <Link href="/universities" className="mt-4 inline-block">
-          <Chip>Browse university matches</Chip>
-        </Link>
+      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+        <PageHeader title="Saved programs" description="Programs you bookmark while browsing show up here." />
+        <Card padding="lg" className="mt-8 flex flex-col items-center gap-4 py-16 text-center">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full border border-line text-ink-soft">
+            <HeartIcon width={22} height={22} />
+          </span>
+          <div>
+            <p className="text-lg font-semibold text-ink">Nothing saved yet</p>
+            <p className="mt-1 text-sm text-ink-soft">Tap the heart on any university match to keep it here for later.</p>
+          </div>
+          <Link href="/universities">
+            <Button>Browse university matches</Button>
+          </Link>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-semibold text-ink">Saved programs</h1>
-      <p className="mt-2 text-ink-soft">
-        Programs you&apos;ve bookmarked while browsing. Fit scores update automatically if your profile changes.
-      </p>
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
+      <PageHeader
+        title="Saved programs"
+        description="Programs you've bookmarked while browsing. Fit scores update automatically if your profile changes."
+        actions={
+          savedMatches.length >= 2 ? (
+            <Link href={`/compare?ids=${savedMatches.slice(0, 3).map((r) => r.program.id).join(",")}`}>
+              <Button variant="secondary">Compare top {Math.min(3, savedMatches.length)}</Button>
+            </Link>
+          ) : undefined
+        }
+      />
 
       <div className="mt-8 flex flex-col gap-4">
         {savedMatches.map((rec) => (

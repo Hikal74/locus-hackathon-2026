@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { VerificationBadge } from "@/components/ui/Badge";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { RequireProfile } from "@/components/layout/RequireProfile";
 import { StatBarChart, StatLegend } from "@/components/compare/StatBarChart";
 import { ValuesSought } from "@/components/university/ValuesSought";
@@ -39,10 +40,15 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-semibold text-ink">Compare your options</h1>
-      <p className="mt-2 text-ink-soft">
-        These are tradeoffs, not a ranking — read the watch-outs before deciding which fits you best.
-      </p>
+      <PageHeader
+        title="Compare your options"
+        description="These are tradeoffs, not a ranking — read the watch-outs before deciding which fits you best."
+        actions={
+          <Link href="/universities">
+            <Button variant="secondary">Change selection</Button>
+          </Link>
+        }
+      />
 
       <Card padding="lg" className="mt-8 flex flex-col gap-6">
         <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">At a glance</p>
@@ -86,7 +92,7 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
         <table className="w-full min-w-[640px] border-separate border-spacing-0">
           <thead>
             <tr>
-              <th className="w-40 text-left text-xs font-medium text-ink-faint" />
+              <th className="sticky left-0 z-10 w-40 bg-paper text-left text-xs font-medium text-ink-faint" />
               {selected.map((rec) => (
                 <th key={rec.program.id} className="px-3 pb-3 text-left align-top">
                   <p className="text-xs text-ink-faint">{rec.university.country}</p>
@@ -128,7 +134,7 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
               {selected.map((rec) => (
                 <Cell key={rec.program.id}>
                   <div className="flex items-center gap-2">
-                    <span>${rec.program.tuitionPerYearUSD.value.toLocaleString()}</span>
+                    <span>${rec.program.tuitionPerYearUSD.value.toLocaleString("en-US")}</span>
                     <VerificationBadge status={rec.program.tuitionPerYearUSD.status} />
                   </div>
                 </Cell>
@@ -240,7 +246,7 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <tr className="border-t-2 border-line-soft">
-      <th scope="row" className="whitespace-nowrap py-3 pr-3 text-left align-top text-xs font-medium text-ink-faint">
+      <th scope="row" className="sticky left-0 z-10 whitespace-nowrap bg-paper py-3 pr-3 text-left align-top text-xs font-medium text-ink-faint">
         {label}
       </th>
       {children}

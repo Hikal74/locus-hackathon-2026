@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useProfile } from "@/lib/store/profile-context";
@@ -59,6 +58,13 @@ const INITIAL_DRAFT: Draft = {
 };
 
 const LEVELS: OnboardingLevel[] = [1, 2, 3, 4];
+
+/** 0-100 fill for one level's bar: full once we're past it, proportional to the steps done inside it, empty before it. */
+function levelFill(level: OnboardingLevel, stepIndex: number): number {
+  const stepsInLevel = ONBOARDING_STEPS.map((s, i) => ({ s, i })).filter(({ s }) => s.level === level);
+  const doneInLevel = stepsInLevel.filter(({ i }) => i <= stepIndex).length;
+  return Math.round((doneInLevel / stepsInLevel.length) * 100);
+}
 
 export default function ProfilePage() {
   const [step, setStep] = useState(0);
@@ -122,12 +128,34 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
-      <div className="mb-3 flex flex-wrap gap-2">
-        {LEVELS.map((lvl) => (
-          <Badge key={lvl} tone={currentStep.level === lvl ? "primary" : currentStep.level > lvl ? "neutral" : "accent"}>
-            {lvl}. {ONBOARDING_LEVELS[lvl].label}
-          </Badge>
-        ))}
+      <div className="mb-6">
+        <div className="flex items-baseline justify-between gap-3 text-sm">
+          <span className="font-semibold text-ink">
+            Step {step + 1} of {ONBOARDING_STEPS.length}
+          </span>
+          <span className="text-right text-ink-faint">{ONBOARDING_LEVELS[currentStep.level].label}</span>
+        </div>
+        <div
+          role="progressbar"
+          aria-label="Profile progress"
+          aria-valuemin={0}
+          aria-valuemax={ONBOARDING_STEPS.length}
+          aria-valuenow={step + 1}
+          className="mt-3 grid grid-cols-4 gap-1.5"
+        >
+          {LEVELS.map((lvl) => (
+            <div key={lvl} className="h-1.5 overflow-hidden rounded-full bg-surface-raised">
+              <div className="h-full rounded-full bg-ink transition-[width] duration-300" style={{ width: `${levelFill(lvl, step)}%` }} />
+            </div>
+          ))}
+        </div>
+        <ol className="mt-2 hidden grid-cols-4 gap-1.5 text-xs sm:grid">
+          {LEVELS.map((lvl) => (
+            <li key={lvl} className={currentStep.level === lvl ? "font-semibold text-ink" : "text-ink-faint"}>
+              {ONBOARDING_LEVELS[lvl].label}
+            </li>
+          ))}
+        </ol>
       </div>
 
       <Card padding="lg" className="flex flex-col gap-6">

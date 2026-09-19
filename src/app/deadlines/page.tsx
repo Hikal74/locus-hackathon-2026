@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { WarningIcon } from "@/components/ui/icons";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { RequireProfile } from "@/components/layout/RequireProfile";
 import { universities, programs } from "@/lib/data/dataset";
 import { getRecommendations } from "@/lib/engine/recommend";
@@ -120,11 +121,10 @@ function DeadlinesBody({ profile }: { profile: StudentProfile }) {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-semibold text-ink">Deadline calendar</h1>
-      <p className="mt-2 text-ink-soft">
-        Every known application and test deadline for your matches, soonest first. Add them to your own calendar with
-        one download.
-      </p>
+      <PageHeader
+        title="Deadline calendar"
+        description="Every known application and test deadline for your matches, soonest first. Add them to your own calendar with one download."
+      />
 
       <Card padding="md" className="mt-6">
         <p className="flex items-start gap-2 text-sm text-ink-soft">

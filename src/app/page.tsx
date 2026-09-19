@@ -1,5 +1,6 @@
 import { Hero } from "@/components/landing/Hero";
 import { Pillars } from "@/components/landing/Pillars";
+import { DatasetStats } from "@/components/landing/DatasetStats";
 import { MoreTools } from "@/components/landing/MoreTools";
 import { ToolTile } from "@/components/landing/ToolTile";
 import { RoadmapTile } from "@/components/landing/RoadmapTile";
@@ -10,6 +11,8 @@ export default function LandingPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
       <Hero />
+
+      <DatasetStats />
 
       <section aria-label="Tools" className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <ToolTile

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { CheckIcon } from "@/components/ui/icons";
 import type { MetroLineId, MetroMap as MetroMapData, MetroStation } from "@/lib/engine/metro";
-import { computeLineProgress, isMapComplete, isStationDone } from "@/lib/engine/metro";
+import { computeLineProgress, isMapComplete, isStationDone, wrapStationLabel } from "@/lib/engine/metro";
 import { cn } from "@/lib/utils/cn";
 
 interface MetroMapProps {
@@ -133,7 +133,7 @@ export function MetroMap({ map, completedIds, onToggleMicrotask }: MetroMapProps
                 {line.stations.map((station, i) => {
                   const cx = RAIL_START_X + i * STATION_GAP;
                   const done = isStationDone(station, completedIds);
-                  const label = station.title.length > 20 ? `${station.title.slice(0, 19)}…` : station.title;
+                  const labelLines = wrapStationLabel(station.title);
                   return (
                     <g
                       key={station.id}
@@ -147,15 +147,20 @@ export function MetroMap({ map, completedIds, onToggleMicrotask }: MetroMapProps
                       }}
                       className="cursor-pointer outline-none"
                     >
+                      <title>{station.title}</title>
                       <StationDot cx={cx} cy={y} color={color} done={done} selected={selectedId === station.id} />
                       <text
                         x={cx}
-                        y={y + 30}
+                        y={y + 28}
                         textAnchor="middle"
                         className={cn("text-[9.5px]", selectedId === station.id ? "font-semibold" : "font-medium")}
                         fill={selectedId === station.id ? color : "var(--color-ink-faint)"}
                       >
-                        {label}
+                        {labelLines.map((line, lineIndex) => (
+                          <tspan key={lineIndex} x={cx} dy={lineIndex === 0 ? 0 : 11}>
+                            {line}
+                          </tspan>
+                        ))}
                       </text>
                     </g>
                   );

@@ -2,6 +2,7 @@
 
 import { Card } from "@/components/ui/Card";
 import { MetroMap } from "@/components/roadmap/MetroMap";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { RequireProfile } from "@/components/layout/RequireProfile";
 import { useRoadmapPlan } from "@/lib/store/use-roadmap-plan";
 import type { StudentProfile } from "@/lib/data/types";
@@ -19,11 +20,15 @@ function RoadmapBody({ profile }: { profile: StudentProfile }) {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-      <h1 className="text-3xl font-semibold text-ink">Your path to a dream portfolio</h1>
-      <p className="mt-2 text-ink-soft">
-        Four tracks, built from your top {Math.min(3, recommendations.length)} matched programs plus a portfolio
-        activity library — every station is something specific you can do. Click one to see why it&apos;s here.
-      </p>
+      <PageHeader
+        title="Your path to a dream portfolio"
+        description={
+          <>
+            Four tracks, built from your top {Math.min(3, recommendations.length)} matched programs plus a portfolio
+            activity library — every station is something specific you can do. Click one to see why it&apos;s here.
+          </>
+        }
+      />
 
       {nextUp && (
         <Card padding="lg" className="mt-8">
