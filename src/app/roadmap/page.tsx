@@ -1,42 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
 import { Card } from "@/components/ui/Card";
 import { MetroMap } from "@/components/roadmap/MetroMap";
 import { RequireProfile } from "@/components/layout/RequireProfile";
-import { universities, programs } from "@/lib/data/dataset";
-import { getRecommendations } from "@/lib/engine/recommend";
-import { buildPortfolioTasks, buildRoadmap } from "@/lib/engine/roadmap";
-import { buildMetroMap, findNextMicrotask } from "@/lib/engine/metro";
-import { useMatchWeights } from "@/lib/store/match-weights";
-import { STORAGE_KEYS, useLocalStorageValue } from "@/lib/store/local-storage";
+import { useRoadmapPlan } from "@/lib/store/use-roadmap-plan";
 import type { StudentProfile } from "@/lib/data/types";
 
-const NO_COMPLETED_TASKS: string[] = [];
-
 function RoadmapBody({ profile }: { profile: StudentProfile }) {
-  const { result: matchResult } = useMatchWeights();
-  const { recommendations } = useMemo(
-    () => getRecommendations(profile, universities, programs, matchResult.weights),
-    [profile, matchResult.weights]
-  );
-  const tasks = useMemo(
-    () => [...buildRoadmap(profile, recommendations), ...buildPortfolioTasks(profile)],
-    [profile, recommendations]
-  );
-  const map = useMemo(() => buildMetroMap(tasks), [tasks]);
-  const [completedIds, setCompletedIds] = useLocalStorageValue<string[]>(
-    STORAGE_KEYS.roadmapProgress,
-    NO_COMPLETED_TASKS,
-    NO_COMPLETED_TASKS
-  );
-
-  function toggleMicrotask(id: string) {
-    const next = completedIds.includes(id) ? completedIds.filter((t) => t !== id) : [...completedIds, id];
-    setCompletedIds(next);
-  }
-
-  const nextUp = findNextMicrotask(map, completedIds);
+  const { recommendations, map, completedIds, toggleMicrotask, nextUp } = useRoadmapPlan(profile);
 
   if (recommendations.length === 0) {
     return (

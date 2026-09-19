@@ -9,7 +9,7 @@ const STEPS = [
   { href: "/universities", label: "Universities" },
   { href: "/compare", label: "Compare" },
   { href: "/roadmap", label: "Roadmap" },
-  { href: "/translate", label: "De-Bureaucratizer" },
+  { href: "/deadlines", label: "Deadlines" },
 ];
 
 export function NavBar() {

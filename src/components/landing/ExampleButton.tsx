@@ -6,14 +6,14 @@ import { useProfile } from "@/lib/store/profile-context";
 import { sampleProfile } from "@/lib/data/sample-profile";
 
 /** Judge mode entry point — loads a realistic filled profile and skips straight to the diagnosis. */
-export function ExampleButton() {
+export function ExampleButton({ compact = false }: { compact?: boolean }) {
   const { setProfile } = useProfile();
   const router = useRouter();
 
   return (
     <Button
       variant="secondary"
-      size="lg"
+      size={compact ? "sm" : "lg"}
       onClick={() => {
         setProfile(sampleProfile);
         router.push("/diagnosis");

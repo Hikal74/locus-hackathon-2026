@@ -10,8 +10,12 @@ import { RequireProfile } from "@/components/layout/RequireProfile";
 import { StatBarChart, StatLegend } from "@/components/compare/StatBarChart";
 import { ValuesSought } from "@/components/university/ValuesSought";
 import { CampusLifeDetails } from "@/components/university/CampusLifeDetails";
+import { ReportCard } from "@/components/insights/ReportCard";
+import { TierBadge, TierExplanation } from "@/components/insights/TierBadge";
 import { universities, programs } from "@/lib/data/dataset";
 import { getRecommendations } from "@/lib/engine/recommend";
+import { getFitTier } from "@/lib/engine/tiers";
+import { buildReportCard } from "@/lib/engine/reportcard";
 import { useMatchWeights } from "@/lib/store/match-weights";
 import type { StudentProfile } from "@/lib/data/types";
 
@@ -96,6 +100,28 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
             <Row label="Fit score">
               {selected.map((rec) => (
                 <Cell key={rec.program.id}>{rec.fitScore}%</Cell>
+              ))}
+            </Row>
+            <Row label="Reach / match / safety">
+              {selected.map((rec) => {
+                const tier = getFitTier(profile, rec.program);
+                return (
+                  <Cell key={rec.program.id}>
+                    <div className="flex flex-col gap-2">
+                      <div>
+                        <TierBadge result={tier} />
+                      </div>
+                      <TierExplanation result={tier} />
+                    </div>
+                  </Cell>
+                );
+              })}
+            </Row>
+            <Row label="Report card">
+              {selected.map((rec) => (
+                <Cell key={rec.program.id}>
+                  <ReportCard entries={buildReportCard(profile, rec.program, rec.university)} />
+                </Cell>
               ))}
             </Row>
             <Row label="Tuition / year">

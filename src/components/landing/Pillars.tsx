@@ -17,9 +17,9 @@ const PILLARS = [
 
 export function Pillars() {
   return (
-    <section className="mt-20 grid gap-6 sm:grid-cols-3">
+    <section className="mt-4 grid gap-4 sm:grid-cols-3">
       {PILLARS.map((pillar) => (
-        <Card key={pillar.title} padding="md">
+        <Card key={pillar.title} padding="sm">
           <h2 className="text-lg font-semibold text-ink">{pillar.title}</h2>
           <p className="mt-2 text-sm text-ink-soft">{pillar.body}</p>
         </Card>

@@ -4,14 +4,14 @@ import { ExampleButton } from "@/components/landing/ExampleButton";
 
 export function Hero() {
   return (
-    <section className="flex flex-col items-center gap-6 py-10 text-center sm:py-20">
-      <h1 className="max-w-4xl text-5xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-7xl">
+    <section className="flex flex-col items-center gap-4 py-4 text-center sm:py-8">
+      <h1 className="max-w-4xl text-4xl font-extrabold leading-[1.05] tracking-tight text-ink sm:text-6xl">
         Your university path, without the guesswork.
       </h1>
-      <p className="max-w-xl text-lg text-ink-soft">
+      <p className="max-w-xl text-base text-ink-soft sm:text-lg">
         Take a short test and get a personalized plan: matches, milestones, and a roadmap built around your goals.
       </p>
-      <div className="mt-2 flex flex-wrap items-center justify-center gap-3">
+      <div className="flex flex-wrap items-center justify-center gap-3">
         <Link href="/profile">
           <Button size="lg">Take the test</Button>
         </Link>

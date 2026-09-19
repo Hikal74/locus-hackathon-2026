@@ -7,8 +7,13 @@ import { Progress } from "@/components/ui/Progress";
 import { WarningIcon } from "@/components/ui/icons";
 import { ValuesSought } from "@/components/university/ValuesSought";
 import { CampusLifeDetails } from "@/components/university/CampusLifeDetails";
+import { ReportCard } from "@/components/insights/ReportCard";
+import { TierBadge, TierExplanation } from "@/components/insights/TierBadge";
 import { useExplain } from "@/lib/ai/use-explain";
+import { useProfile } from "@/lib/store/profile-context";
 import { useSavedPrograms } from "@/lib/store/saved-programs";
+import { getFitTier } from "@/lib/engine/tiers";
+import { buildReportCard } from "@/lib/engine/reportcard";
 import type { Recommendation } from "@/lib/engine/types";
 
 interface RecommendationCardProps {
@@ -21,6 +26,9 @@ export function RecommendationCard({ recommendation, selected, onToggleSelect }:
   const { university, program, fitScore, factors, whyItFits, watchOut } = recommendation;
   const { isSaved, toggleSave } = useSavedPrograms();
   const saved = isSaved(program.id);
+  const { profile } = useProfile();
+  const tier = profile ? getFitTier(profile, program) : null;
+  const reportCard = profile ? buildReportCard(profile, program, university) : null;
 
   const { result, loading, fetchOnce } = useExplain({
     universityName: university.name,
@@ -44,7 +52,10 @@ export function RecommendationCard({ recommendation, selected, onToggleSelect }:
           <p className="text-sm text-ink-soft">{program.name}</p>
         </div>
         <div className="flex flex-col items-end gap-2 shrink-0">
-          <Badge tone="primary">{fitScore}% match</Badge>
+          <div className="flex items-center gap-2">
+            {tier && <TierBadge result={tier} />}
+            <Badge tone="primary">{fitScore}% match</Badge>
+          </div>
           <div className="flex gap-2">
             <Chip
               selected={saved}
@@ -107,6 +118,18 @@ export function RecommendationCard({ recommendation, selected, onToggleSelect }:
           </div>
         </div>
       </details>
+
+      {tier && reportCard && (
+        <details className="group">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-ink marker:content-none underline underline-offset-2">
+            Report card &amp; {tier.tier === "unknown" ? "tier" : `why it's a ${tier.tier}`}
+          </summary>
+          <div className="mt-3 flex flex-col gap-4">
+            <TierExplanation result={tier} />
+            <ReportCard entries={reportCard} />
+          </div>
+        </details>
+      )}
 
       {university.valuesSought && (
         <details className="group">
