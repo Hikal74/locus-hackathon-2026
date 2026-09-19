@@ -17,11 +17,9 @@ Browser
   │
   ├─ Pure functions, run entirely client-side, zero network calls:
   │     getRecommendations(profile, universities, programs, weights?)  → ranked matches
-  │     buildDiagnosis(profile)                               → strengths/gaps/readiness
-  │     buildRoadmap(profile, recommendations)                → prioritized tasks
-  │     generateDuels() / weightsFromRanking() / weightsFromSliders() / weightsFromDuelTally()
-  │           → the four /match methods each produce a personalized weight vector
-  │           consumed by getRecommendations everywhere else (src/lib/engine/personalize.ts, duels.ts)
+  │     buildDiagnosis(profile)                               → strengths/gaps
+  │     buildRoadmap(profile, recommendations) + buildPortfolioTasks(profile)  → prioritized tasks
+  │     buildMetroMap(tasks)                                  → 4-line metro-map diagram
   │
   ├─ POST /api/explain (only when a user expands "Why it fits")
   │     ├─ validates body shape
@@ -39,20 +37,14 @@ Browser
   │           failure the UI shows a real error state, NEVER the deterministic
   │           engine's output disguised as an AI answer (see docs/AI_USAGE.md)
   │
-  ├─ POST /api/chat (the advisor drawer's "Chat" tab — global, every route)
-  │     ├─ validates body shape (Zod)
-  │     ├─ retrieveForQuery() — profile-based retrieval widened with a keyword
-  │     │     match against the question text, so off-profile questions ("what's
-  │     │     the IELTS requirement at KBTU?") still get grounded
-  │     ├─ generateChatReply() → ONE Gemini call per turn, real multi-turn
-  │     │     `contents` array, plain-text reply
-  │     └─ returns { reply, sources } on success, or a typed error
-  │
-  └─ POST /api/priorities (the /match/interview method's final step)
-        ├─ extractPriorityOrder() → ONE schema-constrained Gemini call that
-        │     turns a short conversation into a FactorKey priority order
-        └─ on any failure, the client falls back to a static 3-question quiz
-              (no Gemini call) so the method still works with no API key
+  └─ POST /api/chat (the advisor drawer's "Chat" tab — global, every route)
+        ├─ validates body shape (Zod)
+        ├─ retrieveForQuery() — profile-based retrieval widened with a keyword
+        │     match against the question text, so off-profile questions ("what's
+        │     the IELTS requirement at KBTU?") still get grounded
+        ├─ generateChatReply() → ONE Gemini call per turn, real multi-turn
+        │     `contents` array, plain-text reply
+        └─ returns { reply, sources } on success, or a typed error
 ```
 
 The recommendation/diagnosis/roadmap logic never leaves the browser and never calls the network — it's plain TypeScript over the bundled dataset. `/api/explain` is a small, best-effort copy-polish request that degrades to already-correct template text on any failure. `/api/advisor` and `/api/chat` are the substantial AI features — both reasoning over evidence the deterministic engine already retrieved, never deciding eligibility themselves; see `docs/AI_USAGE.md` for the full pipeline and why the advisor deliberately has no template fallback of its own.
@@ -65,28 +57,29 @@ src/
     data/       Core types, the dataset, the judge-mode sample profile, field labels.
     engine/     Recommendation scoring, explanation text, diagnosis, roadmap generation
                 (roadmap.ts, incl. buildPortfolioTasks — fixed, field-tailored portfolio
-                activities), metro.ts (groups roadmap tasks into the 4 metro-map lines),
-                plus personalize.ts (weight-vector math shared by all 4 /match methods)
-                and duels.ts (head-to-head pair generation). Pure functions — see
-                docs/RECOMMENDATION_ENGINE.md. Unit-tested (src/lib/engine/*.test.ts).
+                activities), metro.ts (groups roadmap tasks into the 4 metro-map lines).
+                Pure functions — see docs/RECOMMENDATION_ENGINE.md. Unit-tested
+                (src/lib/engine/*.test.ts).
     ai/         client.ts (Gemini client + shared model config), errors.ts (shared
                 failure classification), explain.ts + use-explain.ts (rephrasing),
                 retrieval.ts (database → grounded evidence, both profile-based and
                 free-text-query-widened), advisor-prompt.ts + advisor.ts +
                 advisor-schema.ts + use-advisor.ts (the structured advisor), chat.ts +
-                chat-schema.ts + use-chat.ts (the global freeform chat advisor),
-                priorities.ts + priorities-schema.ts (the Interview method's
-                conversation → priority-order extraction). See docs/AI_USAGE.md.
+                chat-schema.ts + use-chat.ts (the global freeform chat advisor). See
+                docs/AI_USAGE.md.
     store/      localStorage-backed state: profile context, saved-programs hook,
-                match-weights hook (the personalized weight vector + which method
-                produced it).
+                match-weights hook (always the balanced FIT_WEIGHTS default now — kept
+                as the one place downstream pages read weights from).
     utils/      cn() classname joiner.
   components/
     ui/         The monochrome design system: Button, Card, Input, Textarea, Select,
-                Badge/VerificationBadge, Chip, Progress, Slider, Tabs, Drawer, icons.tsx
+                Badge/VerificationBadge, Chip, Progress, Tabs, Drawer, icons.tsx
                 (hand-rolled stroke-SVG icon set — no icon library).
     layout/     NavBar, RequireProfile (the auth-less "you need a profile" gate).
-    landing/    Judge-mode entry point.
+    landing/    Judge-mode entry point, hero, pillars, the homepage's decorative metro map.
+    profile/    12-step onboarding orchestrator's per-step field components
+                (src/components/profile/steps/*.tsx), tagged by effort level — see
+                src/lib/data/onboarding-steps.ts.
     recommendations/  RecommendationCard (fit score, why-it-fits, save/compare toggles).
     roadmap/    MetroMap — hand-rolled inline SVG diagram (no charting library) rendering
                 the roadmap as 4 parallel lines converging on a "Dream Portfolio" terminus,
@@ -97,14 +90,10 @@ src/
                 logic, relocated from the Recommendations page into the drawer).
   app/
     page.tsx                Landing
-    profile/page.tsx         6-step questionnaire (adds a free-text step — see docs/AI_USAGE.md)
-    diagnosis/page.tsx        Strengths/constraints/gaps/readiness
-    match/page.tsx             Method picker: Duels / Rank / Fit Map / Interview
-    match/duels/page.tsx        Head-to-head program picks → weightsFromDuelTally
-    match/rank/page.tsx          Drag-order the 6 factors → weightsFromRanking
-    match/map/page.tsx            Live weight sliders + SVG scatter → weightsFromSliders
-    match/interview/page.tsx       AI conversation → extractPriorityOrder → weightsFromRanking
-                                    (falls back to a static quiz with no Gemini call if AI fails)
+    profile/page.tsx         12-step questionnaire orchestrator, ordered into 4 effort levels (see
+                             src/lib/data/onboarding-steps.ts); each step's fields live in
+                             src/components/profile/steps/*.tsx
+    diagnosis/page.tsx        Strengths/constraints/gaps
     recommendations/page.tsx  Ranked list, What-If controls, save/compare, opens the
                                drawer's Full analysis tab (no longer embeds it inline)
     compare/page.tsx           Side-by-side table
@@ -115,8 +104,9 @@ src/
     api/explain/route.ts          Rephrasing server endpoint
     api/advisor/route.ts           Structured AI advisor server endpoint
     api/chat/route.ts               Global chat advisor server endpoint
-    api/priorities/route.ts          Interview method's extraction endpoint
 ```
+
+**Removed:** a `/match` method-picker page (Duels / Rank / Fit Map / AI Interview) and each method's route/engine code once let a student choose how their fit-score weights were personalized. The whole subsystem — `personalize.ts`, `duels.ts`, `priorities.ts`/`priorities-schema.ts`, `POST /api/priorities`, the `Slider` UI primitive — was removed to simplify the flow; every profile now uses the balanced `FIT_WEIGHTS` default. See `docs/BUILDER_JOURNAL.md`.
 
 ## Why these choices
 

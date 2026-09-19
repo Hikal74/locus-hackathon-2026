@@ -13,12 +13,12 @@ interface BadgeProps {
  * distinction has to come from fill weight + border pattern, not hue.
  */
 const toneClasses: Record<NonNullable<BadgeProps["tone"]>, string> = {
-  primary: "bg-ink text-on-primary border-2 border-ink",
-  accent: "bg-paper text-ink border-2 border-ink",
-  success: "bg-ink text-on-primary border-2 border-ink",
-  warning: "bg-paper text-ink border-2 border-dashed border-ink",
-  danger: "bg-paper text-ink border-[3px] border-ink",
-  neutral: "bg-surface text-ink-soft border border-dotted border-ink-faint",
+  primary: "bg-ink text-on-primary border border-ink",
+  accent: "bg-paper text-ink border border-ink",
+  success: "bg-ink text-on-primary border border-ink",
+  warning: "bg-paper text-ink border border-dashed border-ink",
+  danger: "bg-paper text-ink border-2 border-ink",
+  neutral: "bg-surface-raised text-ink-soft border border-dotted border-ink-faint",
 };
 
 export function Badge({ tone = "neutral", children, className }: BadgeProps) {

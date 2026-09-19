@@ -13,12 +13,29 @@ interface ProfileContextValue {
 
 const ProfileContext = createContext<ProfileContextValue | null>(null);
 
+/**
+ * Backfills required array fields a profile saved before they existed won't
+ * have — reading `undefined.some(...)`/`.length` on a stale localStorage
+ * profile throws at runtime otherwise. Single choke point so every consumer
+ * (scoring, diagnosis, advisor prompt, roadmap) can keep treating these as
+ * always-present arrays, matching how `interests`/`relevantSubjects` already work.
+ */
+function withDefaults(profile: StudentProfile): StudentProfile {
+  return {
+    ...profile,
+    fieldWants: profile.fieldWants ?? [],
+    standardizedExamsCompleted: profile.standardizedExamsCompleted ?? [],
+    languageExamsCompleted: profile.languageExamsCompleted ?? [],
+  };
+}
+
 export function ProfileProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfileValue] = useLocalStorageValue<StudentProfile | null | undefined>(
+  const [rawProfile, setProfileValue] = useLocalStorageValue<StudentProfile | null | undefined>(
     STORAGE_KEYS.profile,
     null,
     undefined
   );
+  const profile = rawProfile ? withDefaults(rawProfile) : rawProfile;
 
   function setProfile(next: StudentProfile) {
     setProfileValue(next);

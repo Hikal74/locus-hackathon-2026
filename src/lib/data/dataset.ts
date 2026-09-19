@@ -975,4 +975,198 @@ export const programs: Program[] = [
     tags: ["biology", "research", "life sciences"],
     notes: "Confirmed real degree (ShanghaiTech holds bachelor's authorization for Biological Science). CAS-affiliated, research-heavy — arguably the most credible research angle of the new entries despite the tuition being a placeholder.",
   },
+
+  // --- Arts expansion ---
+  // Previously an honest gap ("no credible Medicine or Arts data found") — a
+  // third research pass found real Arts/Design programs at 7 of the 9
+  // universities. Nazarbayev University and KBTU are deliberately excluded:
+  // confirmed directly (NU's own admissions program list; KBTU's school list)
+  // that neither offers an arts/design bachelor's degree. Medicine remains a
+  // gap — not researched in this pass.
+  {
+    id: "mit-arts",
+    universityId: "mit",
+    name: "Art and Design, B.S. (Course 4-B, Department of Architecture)",
+    field: "arts",
+    degreeLevel: "bachelor",
+    tuitionPerYearUSD: {
+      value: 66720,
+      status: "verified",
+      sourceUrl: "https://sfs.mit.edu/undergraduate-students/the-cost-of-attendance/coa/",
+      verifiedOn: "2026-09-19",
+    },
+    languageRequirements: [
+      { language: "English", test: "IELTS", minScore: "7.0 (7.5 recommended)" },
+      { language: "English", test: "TOEFL", minScore: "90 (100 recommended)" },
+    ],
+    examRequirements: [{ name: "SAT or ACT", required: true }],
+    deadlines: [
+      { label: "Early Action", date: "2026-11-01" },
+      { label: "Regular Action", date: "2027-01-04" },
+    ],
+    scholarships: [
+      { name: "MIT Need-Based Financial Aid", coverage: "Meets 100% of demonstrated need; tuition-free for families under $200k income", competitiveness: "medium" },
+    ],
+    minGpaOn4Scale: { value: 3.9, status: "demo_data" },
+    selectivity: "very_high",
+    researchOpportunities: true,
+    tags: ["design", "visual arts", "architecture", "creative technology"],
+    notes:
+      "Course 4-B leads to the Bachelor of Science in Art and Design (BSAD) within the Department of Architecture — confirmed real degree via MIT's own course catalog (program requirements updated for 2025-26). Same university-wide admission/cost as MIT CS; major declared after enrollment.",
+  },
+  {
+    id: "berkeley-arts",
+    universityId: "berkeley",
+    name: "Art Practice, B.A. (College of Letters and Science)",
+    field: "arts",
+    degreeLevel: "bachelor",
+    tuitionPerYearUSD: {
+      value: 54858,
+      status: "needs_verification",
+      sourceUrl: "https://lao.ca.gov/Publications/Report/5183",
+      verifiedOn: "2026-09-19",
+    },
+    languageRequirements: [
+      { language: "English", test: "IELTS", minScore: "6.5" },
+      { language: "English", test: "TOEFL", minScore: "80 (100 preferred)" },
+    ],
+    examRequirements: [{ name: "SAT/ACT", required: false, notes: "Berkeley uses comprehensive review; test scores are not considered." }],
+    deadlines: [{ label: "UC Freshman Application (system-wide)", date: "2026-11-30" }],
+    scholarships: [
+      { name: "UC Berkeley need-based & Regents' Scholarships", coverage: "Varies; limited need-based aid available for international students", competitiveness: "high" },
+    ],
+    minGpaOn4Scale: { value: 3.8, status: "demo_data" },
+    selectivity: "very_high",
+    researchOpportunities: false,
+    tags: ["visual arts", "studio art", "design", "creative practice"],
+    notes:
+      "Confirmed real, standalone BA in Art Practice via art.berkeley.edu. Tuition reused from Berkeley's general nonresident figure (same caveat as the CS entry) — studio-based program, not primarily research-track.",
+  },
+  {
+    id: "asu-arts",
+    universityId: "asu",
+    name: "Art (Expanded Arts), BFA (Herberger Institute for Design and the Arts)",
+    field: "arts",
+    degreeLevel: "bachelor",
+    tuitionPerYearUSD: {
+      value: 32760,
+      status: "needs_verification",
+      sourceUrl: "https://www.hotcoursesabroad.com/study/course/us-usa/art-expanded-arts-bfa/58338864/program.html",
+      verifiedOn: "2026-09-19",
+    },
+    languageRequirements: [
+      { language: "English", test: "IELTS", minScore: "6.0 (university general minimum)" },
+      { language: "English", test: "TOEFL", minScore: "61 (university general minimum)" },
+    ],
+    examRequirements: [{ name: "SAT/ACT", required: false, notes: "Standardized-test policy not independently confirmed — verify current policy directly on admission.asu.edu." }],
+    deadlines: [{ label: "Fall intake, international applicants (placeholder)", date: "2027-05-01" }],
+    scholarships: [
+      { name: "New American University Scholarship (international)", coverage: "Partial tuition awards for high-achieving international freshmen", competitiveness: "medium" },
+    ],
+    minGpaOn4Scale: { value: 3.0, status: "demo_data" },
+    selectivity: "moderate",
+    researchOpportunities: false,
+    tags: ["visual arts", "design", "studio art", "expanded arts"],
+    notes:
+      "Housed in the Herberger Institute for Design and the Arts, one of the largest arts schools in the US. Tuition is a program-specific secondary-source estimate, distinct from ASU's general $39,062 CS/Engineering figure — plausibly a real arts-program differential, unconfirmed against ASU's own catalog.",
+  },
+  {
+    id: "kaznu-arts",
+    universityId: "kaznu",
+    name: "Design, B.A. (48-month program)",
+    field: "arts",
+    degreeLevel: "bachelor",
+    tuitionPerYearUSD: { value: 4000, status: "demo_data" },
+    languageRequirements: [{ language: "English", test: "IELTS", minScore: "Unconfirmed — most programs taught in Kazakh/Russian" }],
+    examRequirements: [{ name: "UNT (Unified National Testing)", required: true }],
+    deadlines: [{ label: "Admission cycle (typical, unconfirmed)", date: "2027-07-20" }],
+    scholarships: [
+      { name: "State grant / partial tuition waivers", coverage: "Available for academically outstanding and financially needy students", competitiveness: "medium" },
+    ],
+    minGpaOn4Scale: { value: 2.5, status: "demo_data" },
+    selectivity: "moderate",
+    researchOpportunities: false,
+    tags: ["design", "visual arts", "creative practice"],
+    notes:
+      "Confirmed real 48-month Bachelor's Degree in Design program via a TopUniversities.com listing. Tuition placeholder, same caveat as other KazNU entries — no distinct figure found for this program.",
+  },
+  {
+    id: "tsinghua-arts",
+    universityId: "tsinghua",
+    name: "Visual Communication Design, B.A. (Academy of Arts & Design)",
+    field: "arts",
+    degreeLevel: "bachelor",
+    tuitionPerYearUSD: {
+      value: 5556,
+      status: "verified",
+      sourceUrl: "https://international.join-tsinghua.edu.cn/Admission1/Fees.htm",
+      verifiedOn: "2026-09-19",
+    },
+    languageRequirements: [
+      { language: "Chinese", test: "HSK", minScore: "HSK 4 typical entry, HSK 5 by year 1 for bilingual track" },
+      { language: "English", test: "TOEFL", minScore: "No published minimum; score report required" },
+    ],
+    examRequirements: [{ name: "Tsinghua international applicant review", required: true, notes: "Portfolio submission is typical for arts admission but not itemized separately in the sources reviewed — verify directly with the Academy." }],
+    deadlines: [{ label: "Application window (typical, unconfirmed)", date: "2027-03-01" }],
+    scholarships: [
+      { name: "Chinese Government Scholarship (CSC)", coverage: "Full tuition + stipend + accommodation for top international applicants", competitiveness: "high" },
+    ],
+    minGpaOn4Scale: { value: 3.7, status: "demo_data" },
+    selectivity: "very_high",
+    researchOpportunities: false,
+    tags: ["visual arts", "design", "fine arts", "digital media"],
+    notes:
+      "One of 20 undergraduate programs (across Design, Fine Arts, and Art History) at the Academy of Arts & Design — formerly the Central Academy of Arts & Design, merged with Tsinghua in 1999. Tuition confirmed directly on Tsinghua's own official fees page: Arts programs bill at a distinct, higher rate (¥40,000/yr) than Science/Engineering (¥30,000/yr) or Economics/Management/Law (¥26,000/yr) — converted here at ~¥7.2/USD.",
+  },
+  {
+    id: "pku-arts",
+    universityId: "pku",
+    name: "Arts, B.A. (School of Arts)",
+    field: "arts",
+    degreeLevel: "bachelor",
+    tuitionPerYearUSD: {
+      value: 3611,
+      status: "needs_verification",
+      sourceUrl: "https://isd.pku.edu.cn/en/detail.php?id=502",
+      verifiedOn: "2026-09-19",
+    },
+    languageRequirements: [{ language: "Chinese", test: "HSK", minScore: "HSK Level 6, 210+ (A-Level-track applicants may substitute a grade A or above in a Chinese course exam)" }],
+    examRequirements: [
+      {
+        name: "PKU international freshman exam (March) or document review",
+        required: true,
+        notes: "SAT/IB/A-Level/ACT holders may be exempted from the written exam after document screening, then interviewed.",
+      },
+    ],
+    deadlines: [{ label: "Online application window", date: "2027-01-01" }],
+    scholarships: [
+      { name: "Chinese Government Scholarship / PKU International Scholarship", coverage: "Full or partial tuition, some with stipend", competitiveness: "high" },
+    ],
+    minGpaOn4Scale: { value: 3.7, status: "demo_data" },
+    selectivity: "very_high",
+    researchOpportunities: false,
+    tags: ["visual arts", "fine arts", "art history", "design"],
+    notes:
+      "Tuition confirmed from PKU's own International Students Division fee page for the Humanities & Social Sciences bracket, which the School of Arts is understood to fall under — not itemized separately by school in the source reviewed, hence needs_verification rather than a School-of-Arts-specific confirmed figure. Converted from ¥26,000/yr at ~¥7.2/USD.",
+  },
+  {
+    id: "shanghaitech-arts",
+    universityId: "shanghaitech",
+    name: "Industrial Design, B.Eng. (School of Creativity and Art)",
+    field: "arts",
+    degreeLevel: "bachelor",
+    tuitionPerYearUSD: { value: 4500, status: "demo_data" },
+    languageRequirements: [{ language: "English", test: "IELTS", minScore: "Not confirmed; all programs taught in English by default" }],
+    examRequirements: [{ name: "ShanghaiTech international admission review", required: true }],
+    deadlines: [{ label: "Application window (typical, unconfirmed)", date: "2027-03-15" }],
+    scholarships: [
+      { name: "ShanghaiTech International Student Scholarship", coverage: "Partial to full tuition for competitive applicants", competitiveness: "high" },
+    ],
+    minGpaOn4Scale: { value: 3.5, status: "demo_data" },
+    selectivity: "high",
+    researchOpportunities: true,
+    tags: ["design", "industrial design", "interaction design", "creative technology"],
+    notes:
+      "Confirmed real program via ShanghaiTech's own School of Creativity and Art site (sca.shanghaitech.edu.cn) — one of the university's 3 HASS divisions, blending design with the university's science/tech strengths (e.g. 'Artificial Intelligence in Art Design', robotics-adjacent coursework). Tuition placeholder, same caveat as other ShanghaiTech entries.",
+  },
 ];

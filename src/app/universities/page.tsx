@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
@@ -15,20 +14,11 @@ import { useSavedPrograms } from "@/lib/store/saved-programs";
 import { useMatchWeights } from "@/lib/store/match-weights";
 import { universities, programs } from "@/lib/data/dataset";
 import { getRecommendations } from "@/lib/engine/recommend";
-import type { MatchMethod } from "@/lib/engine/personalize";
 import type { Country, StudentProfile } from "@/lib/data/types";
 
 const COUNTRY_OPTIONS: Country[] = ["USA", "Kazakhstan", "China"];
 
-const METHOD_LABELS: Record<MatchMethod, string> = {
-  duels: "Duels",
-  rank: "Rank",
-  map: "Fit Map",
-  interview: "Interview",
-  default: "balanced default weights",
-};
-
-function RecommendationsBody({ profile }: { profile: StudentProfile }) {
+function UniversityMatchBody({ profile }: { profile: StudentProfile }) {
   const { setProfile } = useProfile();
   const router = useRouter();
   const { openDrawer } = useAdvisorUi();
@@ -73,14 +63,8 @@ function RecommendationsBody({ profile }: { profile: StudentProfile }) {
     <div className="mx-auto max-w-4xl px-4 pb-28 pt-12 sm:px-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold text-ink">Your recommendations</h1>
-          <p className="mt-2 text-ink-soft">
-            Ranked by fit to your profile — not a universal ranking. Weighted using{" "}
-            <strong className="text-ink">{METHOD_LABELS[matchResult.method]}</strong>.{" "}
-            <Link href="/match" className="underline underline-offset-2">
-              Refine matches
-            </Link>
-          </p>
+          <h1 className="text-3xl font-semibold text-ink">University Match</h1>
+          <p className="mt-2 text-ink-soft">Ranked by fit to your profile — not a universal ranking.</p>
         </div>
         <Button variant="secondary" onClick={() => openDrawer("analysis")}>
           Open AI Advisor
@@ -107,7 +91,7 @@ function RecommendationsBody({ profile }: { profile: StudentProfile }) {
         </div>
         {changed && (
           <p className="text-sm font-medium text-ink" role="status">
-            Your path changed — recommendations below reflect your new answers.
+            Your path changed — matches below reflect your new answers.
           </p>
         )}
       </Card>
@@ -148,7 +132,7 @@ function RecommendationsBody({ profile }: { profile: StudentProfile }) {
         </p>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-10 border-t-2 border-ink bg-paper/95 backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 z-10 border-t border-line bg-paper/95 backdrop-blur">
         <div className="mx-auto flex max-w-4xl justify-end gap-3 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] sm:px-6">
           <Button variant="secondary" disabled={selectedIds.length < 2} onClick={() => router.push(`/compare?ids=${selectedIds.join(",")}`)}>
             Compare selected ({selectedIds.length})
@@ -160,6 +144,6 @@ function RecommendationsBody({ profile }: { profile: StudentProfile }) {
   );
 }
 
-export default function RecommendationsPage() {
-  return <RequireProfile>{(profile) => <RecommendationsBody profile={profile} />}</RequireProfile>;
+export default function UniversityMatchPage() {
+  return <RequireProfile>{(profile) => <UniversityMatchBody profile={profile} />}</RequireProfile>;
 }

@@ -155,21 +155,29 @@ export function buildRoadmap(profile: StudentProfile, recommendations: Recommend
  * Fixed, field-tailored portfolio-building activities — deliberately NOT derived
  * from an AI reading of the student's free text. There's no structured signal in
  * the profile for "have you built a project," so unlike buildRoadmap's gap-derived
- * tasks, these are always the same 5 aspirational activities with the field name
- * substituted in, never claiming more personalization than that. The one exception
- * is the research task's reason, which reads the student's own stated preference
- * (a structured boolean field, not free-text parsing) rather than inventing one.
+ * tasks, these are always the same 5 aspirational activities. Each one's reason is
+ * substituted with the student's own STRUCTURED answers (field, interests, career
+ * path, program wants, research priority) — never free-text parsing, never an
+ * invented fact — so "what should this actually be about" is specific to them,
+ * not a generic template.
  */
 export function buildPortfolioTasks(profile: StudentProfile): RoadmapTask[] {
   const field = FIELD_LABELS[profile.intendedField];
+  const topInterests = profile.interests.slice(0, 2);
+  const interestClause = topInterests.length > 0 ? ` in ${topInterests.join(" and ")}` : "";
+  const careerClause = profile.careerPath ? ` — real evidence toward becoming a ${profile.careerPath}` : "";
+  const wantsLabor = profile.fieldWants.find((w) => /research/i.test(w));
 
   return [
     {
       id: "portfolio-project",
-      title: `Build a project in ${field}`,
+      title: `Build a project in ${field}${interestClause}`,
       category: "portfolio",
       priority: "next",
-      reason: "A real, finished project is the single most concrete thing admissions readers can point to.",
+      reason:
+        (topInterests.length > 0
+          ? `Aim it squarely at ${topInterests.join(" and ")} — a specific, working thing beats a broad one.`
+          : "A real, finished project is the single most concrete thing admissions readers can point to.") + careerClause + ".",
       microtasks: [
         "Pick an idea you're genuinely curious about",
         "Set up your tools/workspace",
@@ -196,9 +204,10 @@ export function buildPortfolioTasks(profile: StudentProfile): RoadmapTask[] {
       title: `Find a research, mentorship, or shadowing opportunity in ${field}`,
       category: "portfolio",
       priority: "next",
-      reason: profile.preferences.prioritizeResearch
-        ? "You said research opportunities matter to you — this is how you build a track record toward that, not just look for it in a program."
-        : "Even informal exposure (a mentor, a shadowing week) gives you something specific to talk about.",
+      reason:
+        profile.preferences.prioritizeResearch || wantsLabor
+          ? `You said research${wantsLabor ? ` labs/facilities` : " opportunities"} matter to you — this is how you build a track record toward that, not just look for it in a program.`
+          : "Even informal exposure (a mentor, a shadowing week) gives you something specific to talk about.",
       microtasks: [
         "Identify a teacher, professor, or professional to reach out to",
         "Write a short, specific outreach message",
@@ -224,7 +233,9 @@ export function buildPortfolioTasks(profile: StudentProfile): RoadmapTask[] {
       title: "Put your work together somewhere you can point to (portfolio site, GitHub, exhibition)",
       category: "portfolio",
       priority: "next",
-      reason: "Scattered achievements are easy to undersell — one place that shows all of it isn't.",
+      reason: profile.careerPath
+        ? `Frame it around your target of ${profile.careerPath} — scattered achievements are easy to undersell, one place that tells that specific story isn't.`
+        : "Scattered achievements are easy to undersell — one place that shows all of it isn't.",
       microtasks: [
         "Pick where it'll live (personal site, GitHub, etc.)",
         "Write a short description for each piece of work",

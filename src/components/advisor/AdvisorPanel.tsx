@@ -76,7 +76,7 @@ export function AdvisorPanel({ profile }: AdvisorPanelProps) {
       )}
 
       {status === "error" && (
-        <div className="flex flex-col gap-3 rounded-[var(--radius-md)] border-2 border-ink bg-surface p-4">
+        <div className="flex flex-col gap-3 rounded-[var(--radius-md)] border border-line bg-surface p-4">
           <p className="flex items-start gap-2 text-sm text-ink">
             <WarningIcon width={16} height={16} className="mt-0.5 shrink-0" />
             {errorMessage ?? "Something went wrong."}
@@ -97,7 +97,7 @@ export function AdvisorPanel({ profile }: AdvisorPanelProps) {
       )}
 
       {analysis && (
-        <div className="flex flex-col gap-5 border-t-2 border-ink pt-5">
+        <div className="flex flex-col gap-5 border-t border-line pt-5">
           <p className="text-ink">{analysis.summary}</p>
 
           {analysis.profileAnalysis && (
@@ -134,7 +134,7 @@ export function AdvisorPanel({ profile }: AdvisorPanelProps) {
           <Section title="Open questions" items={analysis.questionsOrMissingInformation} />
 
           {sources.length > 0 && (
-            <div className="flex flex-col gap-2 border-t-2 border-ink pt-4">
+            <div className="flex flex-col gap-2 border-t border-line pt-4">
               <p className="text-xs font-medium text-ink-faint">Based on our university database</p>
               <div className="flex flex-wrap gap-2">
                 {sources.map((s) => (
@@ -146,7 +146,7 @@ export function AdvisorPanel({ profile }: AdvisorPanelProps) {
             </div>
           )}
 
-          <div className="flex flex-col gap-2 border-t-2 border-ink pt-4">
+          <div className="flex flex-col gap-2 border-t border-line pt-4">
             <p className="text-xs font-medium text-ink-faint">Ask a follow-up</p>
             {questions.length > 0 && (
               <ul className="flex flex-col gap-1 text-xs text-ink-faint">

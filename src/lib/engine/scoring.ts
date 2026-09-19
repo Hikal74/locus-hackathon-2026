@@ -71,7 +71,7 @@ export function requirementsFit(
   for (const req of program.examRequirements) {
     if (!req.required) continue;
     count++;
-    const done = profile.examsCompleted.some((e) => e.toLowerCase().includes(req.name.toLowerCase()));
+    const done = profile.standardizedExamsCompleted.some((e) => e.toLowerCase().includes(req.name.toLowerCase()));
     if (done) {
       total += 100;
     } else {

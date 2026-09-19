@@ -11,7 +11,7 @@ describe("buildRoadmap", () => {
   });
 
   it("turns an unmet requirement gap into a 'now' priority task", () => {
-    const profile = { ...testProfile, languageLevel: {}, examsCompleted: [] };
+    const profile = { ...testProfile, languageLevel: {}, standardizedExamsCompleted: [] };
     const { recommendations } = getRecommendations(profile, [testUniversity], [testProgram]);
     const tasks = buildRoadmap(profile, recommendations);
     const gapTasks = tasks.filter((t) => t.id.startsWith("gap-"));

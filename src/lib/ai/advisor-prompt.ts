@@ -58,17 +58,31 @@ function buildStudentProfileBlock(profile: StudentProfile): string {
     .map(([lang, level]) => `${lang}: ${level}`);
 
   const lines = [
-    `Intended field of study: ${formatFieldOfStudy(profile.intendedField)}`,
-    profile.grade ? `Grade/year: ${profile.grade}` : null,
+    // Level 1 — Quick Demographics
     profile.age != null ? `Age: ${profile.age}` : null,
+    profile.grade ? `Grade/year: ${profile.grade}` : null,
+    profile.nativeLanguage ? `Native language: ${profile.nativeLanguage}` : null,
+    profile.languageOfInstruction ? `Preferred language of instruction: ${profile.languageOfInstruction}` : null,
+
+    // Level 2 — Preferences & Aspirations
+    `Intended field of study: ${formatFieldOfStudy(profile.intendedField)}`,
+    `Stated interests: ${profile.interests.length ? profile.interests.join(", ") : "not specified"}`,
     `Target countries (in ranked preference order): ${profile.countryPreferences.join(", ") || "not specified"}`,
+
+    // Level 3 — Career Goals & Field Requirements
+    profile.careerPath ? `Target career/job outcome: ${profile.careerPath}` : null,
+    `Must-have program features: ${profile.fieldWants.length ? profile.fieldWants.join(", ") : "none specified"}`,
+
+    // Level 4 — Metrics, Exams & Logistics
     `Stated budget: $${profile.budgetPerYearUSD.toLocaleString()}/year (tuition)`,
     `Intended intake: ${profile.intendedIntake}`,
     `GPA (4.0 scale): ${profile.gpaOn4Scale != null ? profile.gpaOn4Scale.toFixed(2) : "not provided"}`,
+    profile.curriculumType ? `Curriculum: ${profile.curriculumType}` : null,
     `Relevant subjects: ${profile.relevantSubjects.length ? profile.relevantSubjects.join(", ") : "not specified"}`,
-    `Stated interests: ${profile.interests.length ? profile.interests.join(", ") : "not specified"}`,
+    `Standardized exams already completed: ${profile.standardizedExamsCompleted.length ? profile.standardizedExamsCompleted.join(", ") : "none"}`,
+    `Language proficiency exams already taken: ${profile.languageExamsCompleted.length ? profile.languageExamsCompleted.join(", ") : "none"}`,
     `Language proficiency confirmed: ${languageLevels.length ? languageLevels.join("; ") : "none confirmed"}`,
-    `Exams already completed: ${profile.examsCompleted.length ? profile.examsCompleted.join(", ") : "none"}`,
+    profile.citizenshipAndVisa ? `Citizenship / visa status: ${profile.citizenshipAndVisa}` : null,
     `Prioritizes research opportunities: ${profile.preferences.prioritizeResearch ? "yes" : "not stated as a priority"}`,
     `Prioritizes scholarship/financial aid availability: ${profile.preferences.prioritizeScholarship ? "yes" : "not stated as a priority"}`,
     profile.preferences.campusSize ? `Preferred campus size: ${profile.preferences.campusSize}` : null,

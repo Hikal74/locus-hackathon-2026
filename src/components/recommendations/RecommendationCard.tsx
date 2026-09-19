@@ -99,7 +99,7 @@ export function RecommendationCard({ recommendation, selected, onToggleSelect }:
               </ul>
             </div>
           )}
-          <div className="flex flex-col gap-2 border-t-2 border-ink pt-3">
+          <div className="flex flex-col gap-2 border-t border-line pt-3">
             <p className="text-xs font-medium text-ink-faint">Score breakdown</p>
             {factors.map((f) => (
               <Progress key={f.key} label={f.label} value={f.score} tone="primary" />

@@ -105,15 +105,57 @@ describe("AdvisorRequestSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("accepts the new Level 1/3/4 fields (career path, wants, curriculum, split exams, citizenship)", () => {
+    const result = AdvisorRequestSchema.safeParse({
+      profile: {
+        ...testProfile,
+        nativeLanguage: "Kazakh",
+        languageOfInstruction: "English",
+        careerPath: "Software Engineer",
+        fieldWants: ["Research labs / facilities", "Internship placement"],
+        curriculumType: "National",
+        standardizedExamsCompleted: ["SAT", "UNT"],
+        languageExamsCompleted: ["IELTS", "HSK"],
+        citizenshipAndVisa: "Kazakhstani citizen",
+      },
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects an invalid languageOfInstruction enum value", () => {
+    const result = AdvisorRequestSchema.safeParse({
+      profile: { ...testProfile, languageOfInstruction: "Klingon" },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects an invalid curriculumType enum value", () => {
+    const result = AdvisorRequestSchema.safeParse({
+      profile: { ...testProfile, curriculumType: "Homeschool" },
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a profile missing the required standardizedExamsCompleted/languageExamsCompleted arrays", () => {
+    const profile: Record<string, unknown> = { ...testProfile };
+    delete profile.standardizedExamsCompleted;
+    delete profile.languageExamsCompleted;
+    profile.examsCompleted = ["SAT"]; // old, now-removed key
+    const result = AdvisorRequestSchema.safeParse({ profile });
+    expect(result.success).toBe(false);
+  });
+
   it("accepts a profile with empty arrays/no optional fields (a mostly-blank form)", () => {
     const minimal = {
       intendedField: "computer_science",
       interests: [],
+      fieldWants: [],
       relevantSubjects: [],
       countryPreferences: [],
       budgetPerYearUSD: 0,
       languageLevel: {},
-      examsCompleted: [],
+      standardizedExamsCompleted: [],
+      languageExamsCompleted: [],
       intendedIntake: "",
       preferences: {},
     };

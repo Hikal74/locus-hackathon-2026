@@ -15,7 +15,7 @@ interface MetroMapProps {
 
 const ROW_HEIGHT = 84;
 const PAD_TOP = 32;
-const PAD_BOTTOM = 32;
+const PAD_BOTTOM = 46;
 const LABEL_WIDTH = 200;
 const RAIL_START_X = LABEL_WIDTH + 20;
 const STATION_GAP = 78;
@@ -23,7 +23,19 @@ const TRUNK_MARGIN = 40;
 const DIAGONAL_RUN = 70;
 const TERMINUS_LABEL_SPACE = 130;
 
-/** Lines are distinguished by stroke pattern, not color — consistent with this app's monochrome design system. */
+/**
+ * Vivid per-line colors, reused from the homepage's decorative Pathway Metro
+ * illustration (now retired — this is the real, data-driven version of that
+ * same look). Dash pattern is kept alongside color, not replaced by it, so
+ * the lines still read apart under color-blindness or on a printout.
+ */
+const LINE_COLOR: Record<MetroLineId, string> = {
+  academic: "#4C8DFF",
+  portfolio: "#FF5C46",
+  documents: "#4CC26A",
+  applications: "#FF9645",
+};
+
 const LINE_DASH: Record<MetroLineId, string | undefined> = {
   academic: undefined, // solid
   portfolio: "10 6",
@@ -31,19 +43,24 @@ const LINE_DASH: Record<MetroLineId, string | undefined> = {
   applications: "10 4 2 4",
 };
 
-function StationDot({ cx, cy, done, selected }: { cx: number; cy: number; done: boolean; selected: boolean }) {
+const TERMINUS_GOLD = "#F0B400";
+
+function starPoints(cx: number, cy: number, outerR: number, innerR: number): string {
+  const points: string[] = [];
+  for (let i = 0; i < 10; i++) {
+    const angle = (-90 + i * 36) * (Math.PI / 180);
+    const r = i % 2 === 0 ? outerR : innerR;
+    points.push(`${cx + r * Math.cos(angle)},${cy + r * Math.sin(angle)}`);
+  }
+  return points.join(" ");
+}
+
+function StationDot({ cx, cy, color, done, selected }: { cx: number; cy: number; color: string; done: boolean; selected: boolean }) {
   return (
     <>
-      <circle cx={cx} cy={cy} r={14} fill="transparent" />
-      <circle cx={cx} cy={cy} r={selected ? 9 : 7} fill="var(--color-paper)" />
-      <circle
-        cx={cx}
-        cy={cy}
-        r={selected ? 7 : 5.5}
-        fill={done ? "var(--color-ink)" : "var(--color-paper)"}
-        stroke="var(--color-ink)"
-        strokeWidth={2}
-      />
+      <circle cx={cx} cy={cy} r={16} fill="transparent" />
+      <circle cx={cx} cy={cy} r={selected ? 11 : 8} fill="var(--color-paper)" />
+      <circle cx={cx} cy={cy} r={selected ? 8 : 6} fill={done ? color : "var(--color-paper)"} stroke={color} strokeWidth={2.5} />
     </>
   );
 }
@@ -72,7 +89,16 @@ export function MetroMap({ map, completedIds, onToggleMicrotask }: MetroMapProps
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="overflow-x-auto">
+      <div className="flex flex-wrap gap-x-5 gap-y-2">
+        {map.lines.map((line) => (
+          <div key={line.id} className="flex items-center gap-2">
+            <span className="h-2 w-7 shrink-0 rounded-full" style={{ backgroundColor: LINE_COLOR[line.id] }} />
+            <span className="text-sm font-medium text-ink-soft">{line.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="overflow-x-auto rounded-[var(--radius-lg)] border border-line-soft bg-surface p-4">
         <svg
           viewBox={`0 0 ${width} ${height}`}
           role="img"
@@ -83,31 +109,31 @@ export function MetroMap({ map, completedIds, onToggleMicrotask }: MetroMapProps
           {map.lines.map((line, rowIndex) => {
             const y = PAD_TOP + rowIndex * ROW_HEIGHT;
             const dash = LINE_DASH[line.id];
+            const color = LINE_COLOR[line.id];
             const lineProgress = progress[line.id];
             return (
               <g key={line.id}>
-                <text x={4} y={y - 10} className="fill-ink text-[13px] font-semibold">
+                <text x={4} y={y - 10} className="text-[13px] font-semibold" fill={color}>
                   {line.label}
                 </text>
                 <text x={4} y={y + 8} className="fill-ink-faint text-[11px]">
                   {lineProgress.done}/{lineProgress.total} done
                 </text>
 
-                <line x1={RAIL_START_X} y1={y} x2={trunkX} y2={y} stroke="var(--color-ink)" strokeWidth={3} strokeDasharray={dash} />
-                <line
-                  x1={trunkX}
-                  y1={y}
-                  x2={terminusX}
-                  y2={terminusY}
-                  stroke="var(--color-ink)"
-                  strokeWidth={3}
+                <path
+                  d={`M ${RAIL_START_X} ${y} L ${trunkX} ${y} L ${terminusX} ${terminusY}`}
+                  fill="none"
+                  stroke={color}
+                  strokeWidth={6}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   strokeDasharray={dash}
-                  opacity={0.6}
                 />
 
                 {line.stations.map((station, i) => {
                   const cx = RAIL_START_X + i * STATION_GAP;
                   const done = isStationDone(station, completedIds);
+                  const label = station.title.length > 20 ? `${station.title.slice(0, 19)}…` : station.title;
                   return (
                     <g
                       key={station.id}
@@ -121,7 +147,16 @@ export function MetroMap({ map, completedIds, onToggleMicrotask }: MetroMapProps
                       }}
                       className="cursor-pointer outline-none"
                     >
-                      <StationDot cx={cx} cy={y} done={done} selected={selectedId === station.id} />
+                      <StationDot cx={cx} cy={y} color={color} done={done} selected={selectedId === station.id} />
+                      <text
+                        x={cx}
+                        y={y + 30}
+                        textAnchor="middle"
+                        className={cn("text-[9.5px]", selectedId === station.id ? "font-semibold" : "font-medium")}
+                        fill={selectedId === station.id ? color : "var(--color-ink-faint)"}
+                      >
+                        {label}
+                      </text>
                     </g>
                   );
                 })}
@@ -140,19 +175,18 @@ export function MetroMap({ map, completedIds, onToggleMicrotask }: MetroMapProps
             }}
             className="cursor-pointer outline-none"
           >
-            <circle cx={terminusX} cy={terminusY} r={20} fill="transparent" />
-            <circle
-              cx={terminusX}
-              cy={terminusY}
-              r={selectedIsTerminus ? 13 : 11}
-              fill={complete ? "var(--color-ink)" : "var(--color-paper)"}
-              stroke="var(--color-ink)"
-              strokeWidth={3}
+            <circle cx={terminusX} cy={terminusY} r={24} fill="transparent" />
+            <polygon
+              points={starPoints(terminusX, terminusY, selectedIsTerminus ? 18 : 15, selectedIsTerminus ? 8 : 6.5)}
+              fill={complete ? TERMINUS_GOLD : "var(--color-paper)"}
+              stroke={TERMINUS_GOLD}
+              strokeWidth={2.5}
+              strokeLinejoin="round"
             />
-            <text x={terminusX + 22} y={terminusY - 4} className="fill-ink text-[13px] font-semibold">
+            <text x={terminusX + 26} y={terminusY - 4} className="fill-ink text-[13px] font-semibold">
               Dream Portfolio
             </text>
-            <text x={terminusX + 22} y={terminusY + 13} className="fill-ink-faint text-[11px]">
+            <text x={terminusX + 26} y={terminusY + 13} className="fill-ink-faint text-[11px]">
               {map.lines.reduce((n, l) => n + progress[l.id].done, 0)}/{map.lines.reduce((n, l) => n + progress[l.id].total, 0)} overall
             </text>
           </g>

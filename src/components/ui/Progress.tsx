@@ -27,7 +27,7 @@ export function Progress({ label, value, tone = "primary", className }: Progress
         aria-valuemin={0}
         aria-valuemax={100}
         aria-label={label}
-        className="h-3 rounded-[var(--radius-pill)] bg-surface shadow-[var(--shadow-recessed)] border border-line-soft overflow-hidden"
+        className="h-3 rounded-[var(--radius-pill)] bg-surface border border-line-soft overflow-hidden"
       >
         <div
           className={cn(

@@ -13,10 +13,10 @@ export function Chip({ selected = false, className, children, ...props }: ChipPr
       type="button"
       aria-pressed={selected}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] px-4 py-2 text-sm font-medium border-2 border-ink transition-[box-shadow,background-color,transform] duration-150",
+        "inline-flex items-center gap-1.5 rounded-[var(--radius-pill)] px-4 py-2 text-sm font-medium border transition-[background-color,border-color] duration-150",
         selected
-          ? "bg-ink text-on-primary shadow-[var(--shadow-pressed)] translate-x-[1px] translate-y-[1px]"
-          : "bg-paper text-ink shadow-[var(--shadow-raised)] hover:shadow-[var(--shadow-raised-hover)] hover:-translate-x-px hover:-translate-y-px",
+          ? "bg-ink text-on-primary border-ink"
+          : "bg-surface text-ink border-line-soft hover:border-line hover:bg-surface-raised",
         "focus-visible:outline-none focus-visible:shadow-[var(--ring-focus)]",
         className
       )}

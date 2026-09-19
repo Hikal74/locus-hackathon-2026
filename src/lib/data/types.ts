@@ -33,6 +33,10 @@ export interface LanguageRequirement {
   minScore?: string;
 }
 
+export type Language = LanguageRequirement["language"];
+
+export type CurriculumType = "IB" | "AP" | "A-Levels" | "National" | "Other";
+
 export interface ExamRequirement {
   name: string; // e.g. "SAT", "UNT", "Gaokao (for domestic applicants)"
   required: boolean;
@@ -104,19 +108,44 @@ export interface University {
   campusLife?: CampusLife;
 }
 
-/** What the student tells us about themselves. Drives the recommendation engine. */
+/**
+ * What the student tells us about themselves. Drives the recommendation engine.
+ * Fields are grouped below by the onboarding effort level that collects them —
+ * see src/lib/data/onboarding-steps.ts for the step sequence and level tagging.
+ */
 export interface StudentProfile {
+  // Level 1 — Quick Demographics (zero effort)
   age?: number;
   grade?: string;
+  nativeLanguage?: string;
+  languageOfInstruction?: Language;
+
+  // Level 2 — Preferences & Aspirations (low effort)
   intendedField: FieldOfStudy;
   interests: string[];
-  gpaOn4Scale?: number;
-  relevantSubjects: string[];
   countryPreferences: Country[];
+
+  // Level 3 — Career Goals & Field Requirements (medium effort)
+  /** Target job outcome or industry, e.g. "Software Engineer", "Doctor". */
+  careerPath?: string;
+  /** Curated must-have program features, e.g. "Research opportunities", "Industry accreditation". AI-advisor context only — not a scoring factor. */
+  fieldWants: string[];
+
+  // Level 4 — Metrics, Exams & Logistics (high effort)
   budgetPerYearUSD: number;
-  languageLevel: Partial<Record<LanguageRequirement["language"], string>>;
-  examsCompleted: string[];
   intendedIntake: string; // e.g. "Fall 2027"
+  gpaOn4Scale?: number;
+  curriculumType?: CurriculumType;
+  /** SAT/ACT/GRE/GMAT/UNT — matched against Program.examRequirements by requirementsFit(). */
+  standardizedExamsCompleted: string[];
+  /** IELTS/TOEFL/Duolingo/HSK — informational (AI advisor + diagnosis copy), not matched by the scoring engine. */
+  languageExamsCompleted: string[];
+  languageLevel: Partial<Record<Language, string>>;
+  /** Free text, e.g. "Kazakhstani citizen". AI-advisor context only. */
+  citizenshipAndVisa?: string;
+
+  // Not yet collected by any onboarding step (pre-existing gaps, out of scope for the 4-level rework)
+  relevantSubjects: string[];
   preferences: {
     prioritizeResearch?: boolean;
     prioritizeScholarship?: boolean;

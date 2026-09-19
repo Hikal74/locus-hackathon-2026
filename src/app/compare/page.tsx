@@ -25,9 +25,9 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
   if (selected.length < 2) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <p className="text-ink-soft">Select at least 2 programs from your recommendations to compare.</p>
-        <Link href="/recommendations" className="mt-4 inline-block">
-          <Button>Back to recommendations</Button>
+        <p className="text-ink-soft">Select at least 2 programs from your university matches to compare.</p>
+        <Link href="/universities" className="mt-4 inline-block">
+          <Button>Back to university matches</Button>
         </Link>
       </div>
     );

@@ -10,12 +10,12 @@ Students choosing between universities across multiple countries face wildly dif
 
 ## The solution
 
-A structured, six-step questionnaire produces a profile — including a free-text step for anything the structured fields don't capture (projects, competitions, research, leadership, goals). A deterministic scoring algorithm — not an LLM — filters and ranks real university programs against that profile, explains why each one fits, flags what to watch out for, and generates a single prioritized next action. On top of that, an AI advisor (Google Gemini) reasons across the full profile and a relevant slice of the same database to produce a genuinely personalized analysis, not a template. Every factual claim (tuition, deadlines, requirements) is labeled with how confident the data actually is.
+A structured, 12-step questionnaire — organized into a 4-level, effort-ordered hierarchy (Quick Demographics → Preferences & Aspirations → Career Goals & Field Requirements → Metrics, Exams & Logistics) — produces a profile — including a free-text step for anything the structured fields don't capture (projects, competitions, research, leadership, goals). A deterministic scoring algorithm — not an LLM — filters and ranks real university programs against that profile, explains why each one fits, flags what to watch out for, and generates a single prioritized next action. On top of that, an AI advisor (Google Gemini) reasons across the full profile and a relevant slice of the same database to produce a genuinely personalized analysis, not a template. Every factual claim (tuition, deadlines, requirements) is labeled with how confident the data actually is.
 
 ## Key features
 
 - **AI Advisor** — a retrieval-grounded Gemini advisor that reasons across your full profile (including free-text achievements/goals) and a relevant slice of the university database to produce a personalized analysis, not a template.
-- **Guided profile** — a progressive 6-step form instead of one long questionnaire, including a free-text step for anything the structured fields don't capture.
+- **Guided profile** — a 12-step form ordered zero-to-high effort across 4 levels, instead of one long questionnaire, including a free-text step for anything the structured fields don't capture.
 - **Diagnosis** — strengths, constraints, and gaps read directly from the profile, plus a readiness view that is never framed as an admission probability.
 - **Ranked recommendations** — a transparent, six-factor scoring algorithm with a visible score breakdown on every result.
 - **What-If mode** — change budget or country preference and watch the shortlist and reasoning update live.
@@ -89,7 +89,7 @@ Deployed via Vercel. See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the 
 
 ## Limitations
 
-- Dataset covers Computer Science, Business, Engineering, Natural Sciences, and Humanities across 9 universities in the USA, Kazakhstan, and China. No Medicine or Arts program data was found for these institutions.
+- Dataset covers Computer Science, Business, Engineering, Natural Sciences, Humanities, and Arts across 9 universities in the USA, Kazakhstan, and China (Arts at 7 of the 9 — Nazarbayev University and KBTU confirmed to have no such program). No Medicine program data was found for these institutions.
 - No accounts or cross-device sync — state is per-browser (`localStorage`).
 - Both Gemini features (AI Advisor, explanation rephrasing) require a provisioned Google AI Studio (Gemini) API key; without one, the AI Advisor shows a clear "not configured" error and rephrasing falls back to deterministic template text.
 - AI Advisor follow-up conversation history is in-memory only and resets on page reload.
