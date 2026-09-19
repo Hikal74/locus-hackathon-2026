@@ -1,16 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { CheckIcon } from "@/components/ui/icons";
 import type { MetroLineId, MetroMap as MetroMapData, MetroStation } from "@/lib/engine/metro";
-import { computeLineProgress, isMapComplete } from "@/lib/engine/metro";
+import { computeLineProgress, isMapComplete, isStationDone } from "@/lib/engine/metro";
 import { cn } from "@/lib/utils/cn";
 
 interface MetroMapProps {
   map: MetroMapData;
   completedIds: string[];
-  onToggle: (stationId: string) => void;
+  onToggleMicrotask: (microtaskId: string) => void;
 }
 
 const ROW_HEIGHT = 84;
@@ -48,7 +48,7 @@ function StationDot({ cx, cy, done, selected }: { cx: number; cy: number; done: 
   );
 }
 
-export function MetroMap({ map, completedIds, onToggle }: MetroMapProps) {
+export function MetroMap({ map, completedIds, onToggleMicrotask }: MetroMapProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const progress = useMemo(() => computeLineProgress(map, completedIds), [map, completedIds]);
@@ -107,7 +107,7 @@ export function MetroMap({ map, completedIds, onToggle }: MetroMapProps) {
 
                 {line.stations.map((station, i) => {
                   const cx = RAIL_START_X + i * STATION_GAP;
-                  const done = completedIds.includes(station.id);
+                  const done = isStationDone(station, completedIds);
                   return (
                     <g
                       key={station.id}
@@ -163,14 +163,54 @@ export function MetroMap({ map, completedIds, onToggle }: MetroMapProps) {
         {selectedStation && (
           <div className="flex flex-col gap-3">
             <div>
-              <p className={cn("font-semibold text-ink", completedIds.includes(selectedStation.id) && "line-through text-ink-faint")}>
+              <p className={cn("font-semibold text-ink", isStationDone(selectedStation, completedIds) && "line-through text-ink-faint")}>
                 {selectedStation.title}
               </p>
               <p className="mt-1 text-sm text-ink-soft">{selectedStation.reason}</p>
             </div>
-            <Button size="sm" variant="secondary" onClick={() => onToggle(selectedStation.id)} className="self-start">
-              {completedIds.includes(selectedStation.id) ? "Mark as not done" : "Mark as done"}
-            </Button>
+            {selectedStation.microtasks.length > 1 && (
+              <ul className="flex flex-col gap-1.5">
+                {selectedStation.microtasks.map((m) => {
+                  const done = completedIds.includes(m.id);
+                  return (
+                    <li key={m.id}>
+                      <button
+                        type="button"
+                        onClick={() => onToggleMicrotask(m.id)}
+                        className="flex w-full items-start gap-2 rounded-[var(--radius-sm)] px-2 py-1.5 text-left text-sm hover:bg-surface"
+                      >
+                        <span
+                          className={cn(
+                            "mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] border-2 border-ink",
+                            done && "bg-ink"
+                          )}
+                        >
+                          {done && <CheckIcon width={10} height={10} className="text-on-primary" />}
+                        </span>
+                        <span className={cn("text-ink-soft", done && "line-through text-ink-faint")}>{m.title}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            {selectedStation.microtasks.length === 1 && (
+              <button
+                type="button"
+                onClick={() => onToggleMicrotask(selectedStation.microtasks[0].id)}
+                className="flex items-center gap-2 rounded-[var(--radius-sm)] border-2 border-ink px-3 py-2 text-sm font-medium hover:bg-surface self-start"
+              >
+                <span
+                  className={cn(
+                    "flex h-4 w-4 shrink-0 items-center justify-center rounded-[3px] border-2 border-ink",
+                    completedIds.includes(selectedStation.microtasks[0].id) && "bg-ink"
+                  )}
+                >
+                  {completedIds.includes(selectedStation.microtasks[0].id) && <CheckIcon width={10} height={10} className="text-on-primary" />}
+                </span>
+                {completedIds.includes(selectedStation.microtasks[0].id) ? "Marked as done" : "Mark as done"}
+              </button>
+            )}
           </div>
         )}
         {selectedIsTerminus && (
@@ -179,12 +219,12 @@ export function MetroMap({ map, completedIds, onToggle }: MetroMapProps) {
             <p className="text-sm text-ink-soft">
               {complete
                 ? "Every station on every line is checked off — this is what a fully-built application looks like."
-                : "Where all four tracks lead. Check off stations on each line above to fill it in."}
+                : "Where all four tracks lead. Check off the steps inside each station above to fill it in."}
             </p>
           </div>
         )}
         {!selectedStation && !selectedIsTerminus && (
-          <p className="text-sm text-ink-faint">Click or tab to a station to see details.</p>
+          <p className="text-sm text-ink-faint">Click or tab to a station to see its steps.</p>
         )}
       </Card>
     </div>

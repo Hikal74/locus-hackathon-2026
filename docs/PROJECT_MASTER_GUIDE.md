@@ -49,7 +49,7 @@ Structured data   Deterministic    Personalized        UI (true-
 **No LLM sits between the student and a recommendation.** The entire matching pipeline — filtering, scoring, ranking, "why it fits" text — is plain TypeScript over structured data, whether the weights are the default table or one of the four personalized vectors from §7.2. AI sits on top only as a reasoning/copy layer (see §7.3 and `docs/AI_USAGE.md`), never as the source of which universities appear or how they're weighted.
 
 ### Stack rationale
-- **Next.js App Router** — one framework for routing, rendering, and the four server endpoints the app needs (`/api/explain`, `/api/advisor`, `/api/chat`, `/api/priorities`).
+- **Next.js App Router** — one framework for routing, rendering, and the five server endpoints the app needs (`/api/explain`, `/api/advisor`, `/api/chat`, `/api/priorities`, `/api/debureaucratize`).
 - **Tailwind v4 + CSS custom properties** — the true-monochrome design system's shadows, colors, and radii are defined once as CSS variables in `globals.css`, keeping the entire visual language in one file. No new dependencies were added for the rebuild (no icon library, no chart library, no drag-and-drop library) — icons, the Fit Map's scatter chart, and drag-reorder are all hand-rolled, consistent with the "no state library" stance below.
 - **No state library** — cross-page state is small (a profile plus two persisted lists), covered by React Context and one custom `localStorage` hook.
 - **No database (yet)** — see §3. The data-access boundary is the one seam that would need to change to add one.
@@ -88,6 +88,14 @@ Two AI features sit beyond the copy-polish layer (§ below), sharing one honest-
 
 On any failure, the UI shows a real error with a retry option — there is deliberately no template fallback for either feature, since neither a personalized analysis nor a freeform answer has a safe deterministic equivalent to fall back to. Full pipeline, prompt design, and anti-hallucination measures: `docs/AI_USAGE.md`.
 
+### 7.4 De-Bureaucratizer
+
+`/translate` (linked from the NavBar, no profile required) takes pasted admissions or financial-aid text and returns a plain-English rewrite plus a short glossary of the jargon it found (`POST /api/debureaucratize`, `src/lib/ai/debureaucratize*.ts`). Same honesty contract as the other AI features: Zod-validated request (8000-char cap), and a real typed error with a Retry button on any failure (including a Gemini `429`), never a fabricated translation.
+
+### 7.5 Richer program facts on Recommendations and Compare
+
+Programs can carry `valuesSought` (traits the university says it looks for) and `campusLife` (cost of living, on/off-campus housing, neighborhood, social climate), both verification-tagged like every other fact. The Compare page adds an at-a-glance bar-chart panel (`StatBarChart`, patterns not color), a "What they look for" row, and per-university campus-life cards; recommendation cards expose the same details in expandable sections.
+
 ### What-If mode
 On the Recommendations page, changing the budget or toggling a country updates a local scenario, immediately re-runs the recommendation engine, and shows a "Your path changed" indicator. This demonstrates that matches are computed per-student rather than static.
 
@@ -101,10 +109,12 @@ Two real defects were found through browser-driven testing (Playwright), not jus
 ## 9. Verification performed
 
 - `tsc --noEmit` and `eslint` — clean, after the full rebuild.
-- `npm test` (Vitest) — 88 tests: the original 62 (engine scoring/filters/ranking/diagnosis/roadmap, AI advisor retrieval/schema/error-handling via a mocked Gemini client) plus new coverage added in this rebuild — `personalize.test.ts` (weight normalization/ranking/tally math), `duels.test.ts` (pairing generation), `chat.test.ts` and `priorities.test.ts` (mirroring the advisor's mocked-client pattern) — plus extended `recommend.test.ts` cases proving a custom weight vector actually changes ranking. No real network calls in the automated suite.
+- `npm test` (Vitest) — 134 tests as of the De-Bureaucratizer/Compare/microtask pass (16 files; the breakdown below describes the 88 from the 2026-09-18 rebuild, plus new `debureaucratize*.test.ts` and extended `metro`/`roadmap` tests): the original 62 (engine scoring/filters/ranking/diagnosis/roadmap, AI advisor retrieval/schema/error-handling via a mocked Gemini client) plus new coverage added in this rebuild — `personalize.test.ts` (weight normalization/ranking/tally math), `duels.test.ts` (pairing generation), `chat.test.ts` and `priorities.test.ts` (mirroring the advisor's mocked-client pattern) — plus extended `recommend.test.ts` cases proving a custom weight vector actually changes ranking. No real network calls in the automated suite.
 - `npm run build` succeeds with `/api/explain`, `/api/advisor`, `/api/chat`, and `/api/priorities` all correctly built as dynamic server routes, all other routes static.
 - **Full rebuild verified live in-browser (2026-09-18)**, against a real provisioned `GOOGLE_AI_API_KEY`, via a manual Playwright script (screenshots + `console --errors` checks, deleted after use — not committed, same practice as the original build's manual verification): landing → sample profile → diagnosis → match picker → Rank → Duels → recommendations (method label + "Refine matches" link correct) → compare (2 selected) → roadmap → saved → Fit Map (sliders live-reposition the scatter, click-to-inspect works) → Interview (real AI exchange succeeded; a genuine transient Gemini `503` mid-conversation correctly triggered the static-quiz fallback, proving that path fires on a real failure, not just in theory) → global advisor drawer opened from multiple routes, both tabs, a real chat round-trip succeeded, and the structured advisor's honest error state rendered correctly during that same transient `503`. Verified at both desktop and 375px mobile width; zero console errors throughout.
 - This pass also caught and fixed two real bugs before they shipped: a label-collision on the Fit Map's y-axis title (fixed by widening the top margin and only labeling the selected point, not every point — see `docs/RECOMMENDATION_ENGINE.md`'s dataviz-informed approach) and a mobile NavBar layout bug where the logo and step-pills interleaved into a garbled multi-line header at 375px (fixed by making the nav its own full-width, horizontally-scrollable row instead of wrapping inline with the logo).
+
+- **De-Bureaucratizer, Compare additions, and roadmap micro-steps verified live in-browser (2026-09-19)** via another deleted-after-use Playwright script: Compare with 3 programs (at-a-glance charts, values row, campus-life cards) and the Roadmap's "Do this right now" card + click-to-expand micro-step checklists rendered correctly. `/api/debureaucratize` returned a correct plain-text rewrite and glossary on a direct call. Gemini intermittently returned `429` during this session (same key, all endpoints); the UI's honest rate-limit error + Retry state rendered correctly, and the request succeeded on retry. `tsc`, `eslint`, `npm test`, and `npm run build` all clean. Also fixed a display bug where four Chinese-program HSK entries rendered as "HSK HSK 4" (data string repeated the test name).
 
 **Not yet verified**: a formal accessibility audit, and a production deployment.
 
@@ -119,6 +129,8 @@ Pathlight turns a student's field, country, budget, and constraints into a ranke
 - Deterministic recommendation engine with documented default weights, hard constraints, an optional personalized weight vector, and an automated test suite.
 - Four selectable matching methods, each producing a personalized weight vector fed into the same engine — see `docs/RECOMMENDATION_ENGINE.md` §2.5.
 - A branching metro-map roadmap: 4 parallel, deterministic tracks (Academic Prep, Portfolio & Achievements, Documents & Funding, Applications & Essays) converging on a "Dream Portfolio" terminus — hand-rolled SVG, lines distinguished by stroke pattern not color, click-to-expand stations, no AI involved in deciding what's on it.
+- A De-Bureaucratizer page (`/translate`) that rewrites dense admissions text into plain English with a jargon glossary — see §7.4.
+- Compare page with at-a-glance charts, "what they look for", and campus-life cost/housing sections; roadmap stations with ordered micro-step checklists and a "Do this right now" next-move card — see §7.5.
 - A global AI advisor drawer, reachable from every page, with a freeform Chat tab (persisted across reloads) and the original structured Full Analysis tab.
 - What-If scenario mode with live recompute.
 - Data trust system wired end-to-end, now with a non-color (icon + border pattern) encoding for the monochrome design.

@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { VerificationBadge } from "@/components/ui/Badge";
 import { RequireProfile } from "@/components/layout/RequireProfile";
+import { StatBarChart, StatLegend } from "@/components/compare/StatBarChart";
+import { ValuesSought } from "@/components/university/ValuesSought";
+import { CampusLifeDetails } from "@/components/university/CampusLifeDetails";
 import { universities, programs } from "@/lib/data/dataset";
 import { getRecommendations } from "@/lib/engine/recommend";
 import { useMatchWeights } from "@/lib/store/match-weights";
@@ -36,6 +39,44 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
       <p className="mt-2 text-ink-soft">
         These are tradeoffs, not a ranking — read the watch-outs before deciding which fits you best.
       </p>
+
+      <Card padding="lg" className="mt-8 flex flex-col gap-6">
+        <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">At a glance</p>
+        <StatLegend names={selected.map((r) => r.university.name)} />
+        <div className="grid gap-6 sm:grid-cols-3">
+          <StatBarChart
+            label="Fit score"
+            maxValue={100}
+            entries={selected.map((r) => ({ id: r.program.id, name: r.university.name, value: r.fitScore, displayValue: `${r.fitScore}%` }))}
+          />
+          <StatBarChart
+            label="Tuition / year"
+            maxValue={Math.max(...selected.map((r) => r.program.tuitionPerYearUSD.value)) * 1.1}
+            entries={selected.map((r) => ({
+              id: r.program.id,
+              name: r.university.name,
+              value: r.program.tuitionPerYearUSD.value,
+              displayValue: `$${Math.round(r.program.tuitionPerYearUSD.value / 1000)}k`,
+              verification: r.program.tuitionPerYearUSD.status,
+            }))}
+          />
+          {selected.some((r) => r.program.minGpaOn4Scale) && (
+            <StatBarChart
+              label="Min. GPA (4.0)"
+              maxValue={4}
+              entries={selected
+                .filter((r) => r.program.minGpaOn4Scale)
+                .map((r) => ({
+                  id: r.program.id,
+                  name: r.university.name,
+                  value: r.program.minGpaOn4Scale!.value,
+                  displayValue: r.program.minGpaOn4Scale!.value.toFixed(1),
+                  verification: r.program.minGpaOn4Scale!.status,
+                }))}
+            />
+          )}
+        </div>
+      </Card>
 
       <div className="mt-8 overflow-x-auto">
         <table className="w-full min-w-[640px] border-separate border-spacing-0">
@@ -130,9 +171,34 @@ function CompareContent({ profile }: { profile: StudentProfile }) {
                 </Cell>
               ))}
             </Row>
+            {selected.some((r) => r.university.valuesSought) && (
+              <Row label="What they look for">
+                {selected.map((rec) => (
+                  <Cell key={rec.program.id}>
+                    <ValuesSought valuesSought={rec.university.valuesSought} />
+                  </Cell>
+                ))}
+              </Row>
+            )}
           </tbody>
         </table>
       </div>
+
+      {selected.some((r) => r.university.campusLife) && (
+        <div className="mt-8">
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">Campus &amp; city life</p>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {selected.map((rec) => (
+              <Card key={rec.program.id} padding="md">
+                <p className="text-sm font-semibold text-ink">{rec.university.name}</p>
+                <div className="mt-3">
+                  <CampusLifeDetails campusLife={rec.university.campusLife} />
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       <Card padding="md" className="mt-8">
         <p className="text-sm text-ink-soft">

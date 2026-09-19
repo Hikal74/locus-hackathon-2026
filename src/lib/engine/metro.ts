@@ -10,12 +10,19 @@ import type { RoadmapCategory, RoadmapTask } from "./roadmap";
 
 export type MetroLineId = "academic" | "portfolio" | "documents" | "applications";
 
+export interface Microtask {
+  id: string;
+  title: string;
+}
+
 export interface MetroStation {
   id: string;
   title: string;
   reason: string;
   lineId: MetroLineId;
   order: number;
+  /** Always non-empty — a task with no explicit breakdown falls back to a single microtask matching its own title. */
+  microtasks: Microtask[];
 }
 
 export interface MetroLine {
@@ -41,9 +48,24 @@ export function buildMetroMap(tasks: RoadmapTask[]): MetroMap {
     label,
     stations: tasks
       .filter((t) => categories.includes(t.category))
-      .map((t, order) => ({ id: t.id, title: t.title, reason: t.reason, lineId: id, order })),
+      .map((t, order) => ({
+        id: t.id,
+        title: t.title,
+        reason: t.reason,
+        lineId: id,
+        order,
+        microtasks: (t.microtasks && t.microtasks.length > 0 ? t.microtasks : [t.title]).map((title, i) => ({
+          id: `${t.id}::${i}`,
+          title,
+        })),
+      })),
   }));
   return { lines };
+}
+
+/** A station is done once every one of its microtasks is checked off. */
+export function isStationDone(station: MetroStation, completedIds: string[]): boolean {
+  return station.microtasks.every((m) => completedIds.includes(m.id));
 }
 
 export interface LineProgress {
@@ -54,7 +76,7 @@ export interface LineProgress {
 export function computeLineProgress(map: MetroMap, completedIds: string[]): Record<MetroLineId, LineProgress> {
   const result = {} as Record<MetroLineId, LineProgress>;
   for (const line of map.lines) {
-    const done = line.stations.filter((s) => completedIds.includes(s.id)).length;
+    const done = line.stations.filter((s) => isStationDone(s, completedIds)).length;
     result[line.id] = { done, total: line.stations.length };
   }
   return result;
@@ -63,5 +85,23 @@ export function computeLineProgress(map: MetroMap, completedIds: string[]): Reco
 /** Every station across every line is complete — the map's "Dream Portfolio" terminus lights up. */
 export function isMapComplete(map: MetroMap, completedIds: string[]): boolean {
   const allStations = map.lines.flatMap((l) => l.stations);
-  return allStations.length > 0 && allStations.every((s) => completedIds.includes(s.id));
+  return allStations.length > 0 && allStations.every((s) => isStationDone(s, completedIds));
+}
+
+/**
+ * The single next concrete thing to do — the first incomplete microtask, in
+ * line then station then step order. This is what "know what to do right now"
+ * concretely means: one specific action, not a whole station.
+ */
+export function findNextMicrotask(map: MetroMap, completedIds: string[]): { station: MetroStation; microtask: Microtask } | null {
+  for (const line of map.lines) {
+    for (const station of line.stations) {
+      for (const microtask of station.microtasks) {
+        if (!completedIds.includes(microtask.id)) {
+          return { station, microtask };
+        }
+      }
+    }
+  }
+  return null;
 }

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildMetroMap, computeLineProgress, isMapComplete } from "./metro";
+import { buildMetroMap, computeLineProgress, findNextMicrotask, isMapComplete, isStationDone } from "./metro";
 import type { RoadmapTask } from "./roadmap";
 
 const tasks: RoadmapTask[] = [
   { id: "gap-0", title: "SAT not completed", category: "exams", priority: "now", reason: "" },
-  { id: "documents-transcripts", title: "Transcripts", category: "documents", priority: "now", reason: "" },
+  { id: "documents-transcripts", title: "Transcripts", category: "documents", priority: "now", reason: "", microtasks: ["Request", "Certify"] },
   { id: "scholarships", title: "Research scholarships", category: "scholarships", priority: "next", reason: "" },
   { id: "portfolio-project", title: "Build a project", category: "portfolio", priority: "next", reason: "" },
   { id: "essays", title: "Draft essay", category: "essays", priority: "later", reason: "" },
@@ -25,14 +25,44 @@ describe("buildMetroMap", () => {
     const map = buildMetroMap([]);
     expect(map.lines.every((l) => l.stations.length === 0)).toBe(true);
   });
+
+  it("falls back to a single microtask matching the station title when the task provides none", () => {
+    const map = buildMetroMap(tasks);
+    const scholarshipsStation = map.lines.flatMap((l) => l.stations).find((s) => s.id === "scholarships");
+    expect(scholarshipsStation?.microtasks).toEqual([{ id: "scholarships::0", title: "Research scholarships" }]);
+  });
+
+  it("expands an explicit microtasks array into ordered, id-suffixed steps", () => {
+    const map = buildMetroMap(tasks);
+    const docsStation = map.lines.flatMap((l) => l.stations).find((s) => s.id === "documents-transcripts");
+    expect(docsStation?.microtasks).toEqual([
+      { id: "documents-transcripts::0", title: "Request" },
+      { id: "documents-transcripts::1", title: "Certify" },
+    ]);
+  });
+});
+
+describe("isStationDone", () => {
+  it("is false until every microtask is complete", () => {
+    const map = buildMetroMap(tasks);
+    const docsStation = map.lines.flatMap((l) => l.stations).find((s) => s.id === "documents-transcripts")!;
+    expect(isStationDone(docsStation, ["documents-transcripts::0"])).toBe(false);
+    expect(isStationDone(docsStation, ["documents-transcripts::0", "documents-transcripts::1"])).toBe(true);
+  });
 });
 
 describe("computeLineProgress", () => {
-  it("reports accurate done/total per line", () => {
+  it("reports accurate done/total per line, counting a station done only once all its microtasks are", () => {
     const map = buildMetroMap(tasks);
-    const progress = computeLineProgress(map, ["documents-transcripts"]);
+    const progress = computeLineProgress(map, ["documents-transcripts::0", "documents-transcripts::1"]);
     expect(progress.documents).toEqual({ done: 1, total: 2 });
     expect(progress.portfolio).toEqual({ done: 0, total: 1 });
+  });
+
+  it("does not count a station as done when only some of its microtasks are checked", () => {
+    const map = buildMetroMap(tasks);
+    const progress = computeLineProgress(map, ["documents-transcripts::0"]);
+    expect(progress.documents.done).toBe(0);
   });
 });
 
@@ -47,9 +77,28 @@ describe("isMapComplete", () => {
     expect(isMapComplete(map, [])).toBe(false);
   });
 
-  it("is true once every station across every line is complete", () => {
+  it("is true once every microtask across every line is complete", () => {
     const map = buildMetroMap(tasks);
-    const allIds = map.lines.flatMap((l) => l.stations.map((s) => s.id));
-    expect(isMapComplete(map, allIds)).toBe(true);
+    const allMicrotaskIds = map.lines.flatMap((l) => l.stations.flatMap((s) => s.microtasks.map((m) => m.id)));
+    expect(isMapComplete(map, allMicrotaskIds)).toBe(true);
+  });
+});
+
+describe("findNextMicrotask", () => {
+  it("returns null for an empty map", () => {
+    expect(findNextMicrotask(buildMetroMap([]), [])).toBeNull();
+  });
+
+  it("returns the first incomplete microtask in line/station/step order", () => {
+    const map = buildMetroMap(tasks);
+    const next = findNextMicrotask(map, []);
+    expect(next?.station.id).toBe("gap-0");
+  });
+
+  it("skips completed microtasks and stations", () => {
+    const map = buildMetroMap(tasks);
+    const allInAcademicLine = map.lines.find((l) => l.id === "academic")!.stations.flatMap((s) => s.microtasks.map((m) => m.id));
+    const next = findNextMicrotask(map, allInAcademicLine);
+    expect(next?.station.id).not.toBe("gap-0");
   });
 });

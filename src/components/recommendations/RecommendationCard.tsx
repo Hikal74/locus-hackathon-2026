@@ -5,6 +5,8 @@ import { Card } from "@/components/ui/Card";
 import { Chip } from "@/components/ui/Chip";
 import { Progress } from "@/components/ui/Progress";
 import { WarningIcon } from "@/components/ui/icons";
+import { ValuesSought } from "@/components/university/ValuesSought";
+import { CampusLifeDetails } from "@/components/university/CampusLifeDetails";
 import { useExplain } from "@/lib/ai/use-explain";
 import { useSavedPrograms } from "@/lib/store/saved-programs";
 import type { Recommendation } from "@/lib/engine/types";
@@ -105,6 +107,28 @@ export function RecommendationCard({ recommendation, selected, onToggleSelect }:
           </div>
         </div>
       </details>
+
+      {university.valuesSought && (
+        <details className="group">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-ink marker:content-none underline underline-offset-2">
+            What they look for
+          </summary>
+          <div className="mt-3">
+            <ValuesSought valuesSought={university.valuesSought} />
+          </div>
+        </details>
+      )}
+
+      {university.campusLife && (
+        <details className="group">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-ink marker:content-none underline underline-offset-2">
+            Campus &amp; city life
+          </summary>
+          <div className="mt-3">
+            <CampusLifeDetails campusLife={university.campusLife} />
+          </div>
+        </details>
+      )}
     </Card>
   );
 }

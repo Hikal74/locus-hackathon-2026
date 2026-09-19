@@ -69,6 +69,28 @@ export interface Program {
   notes?: string;
 }
 
+/**
+ * Cost-of-living and housing context around a university — same honesty rules
+ * as every other dataset fact (see docs/DATA_AND_TRUST.md): figures that
+ * couldn't be sourced against something concrete are still shown, but tagged
+ * "needs_verification" or "demo_data" rather than presented as confirmed.
+ */
+export interface CampusLife {
+  /** Rent + food + local transport estimate, excludes tuition. */
+  costOfLivingPerMonthUSD: SourcedFact<number>;
+  onCampusHousing: {
+    available: boolean;
+    priceRangePerYearUSD?: SourcedFact<[number, number]>;
+    note?: string;
+  };
+  /** Typical cost/availability of off-campus housing near the university, in plain text. */
+  offCampusHousingNote: string;
+  /** Shops, transit, walkability around campus. */
+  neighborhoodNote: string;
+  /** General social/cultural climate for an international student. */
+  socialClimateNote: string;
+}
+
 export interface University {
   id: string;
   name: string;
@@ -77,6 +99,9 @@ export interface University {
   websiteUrl: string;
   size: "small" | "medium" | "large";
   description: string;
+  /** Short trait phrases the university states it looks for in applicants, e.g. "Community impact". */
+  valuesSought?: SourcedFact<string[]>;
+  campusLife?: CampusLife;
 }
 
 /** What the student tells us about themselves. Drives the recommendation engine. */

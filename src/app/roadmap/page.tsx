@@ -7,7 +7,7 @@ import { RequireProfile } from "@/components/layout/RequireProfile";
 import { universities, programs } from "@/lib/data/dataset";
 import { getRecommendations } from "@/lib/engine/recommend";
 import { buildPortfolioTasks, buildRoadmap } from "@/lib/engine/roadmap";
-import { buildMetroMap } from "@/lib/engine/metro";
+import { buildMetroMap, findNextMicrotask } from "@/lib/engine/metro";
 import { useMatchWeights } from "@/lib/store/match-weights";
 import { STORAGE_KEYS, useLocalStorageValue } from "@/lib/store/local-storage";
 import type { StudentProfile } from "@/lib/data/types";
@@ -31,12 +31,12 @@ function RoadmapBody({ profile }: { profile: StudentProfile }) {
     NO_COMPLETED_TASKS
   );
 
-  function toggleTask(id: string) {
+  function toggleMicrotask(id: string) {
     const next = completedIds.includes(id) ? completedIds.filter((t) => t !== id) : [...completedIds, id];
     setCompletedIds(next);
   }
 
-  const nextAction = tasks.find((t) => t.priority !== "later" && !completedIds.includes(t.id)) ?? tasks.find((t) => !completedIds.includes(t.id));
+  const nextUp = findNextMicrotask(map, completedIds);
 
   if (recommendations.length === 0) {
     return (
@@ -54,16 +54,18 @@ function RoadmapBody({ profile }: { profile: StudentProfile }) {
         activity library — every station is something specific you can do. Click one to see why it&apos;s here.
       </p>
 
-      {nextAction && (
+      {nextUp && (
         <Card padding="lg" className="mt-8">
-          <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">Your next move</p>
-          <h2 className="mt-1 text-xl font-semibold text-ink">{nextAction.title}</h2>
-          <p className="mt-2 text-sm text-ink-soft">{nextAction.reason}</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">Do this right now</p>
+          <h2 className="mt-1 text-xl font-semibold text-ink">{nextUp.microtask.title}</h2>
+          <p className="mt-2 text-sm text-ink-soft">
+            Part of &ldquo;{nextUp.station.title}&rdquo; — {nextUp.station.reason}
+          </p>
         </Card>
       )}
 
       <div className="mt-8">
-        <MetroMap map={map} completedIds={completedIds} onToggle={toggleTask} />
+        <MetroMap map={map} completedIds={completedIds} onToggleMicrotask={toggleMicrotask} />
       </div>
     </div>
   );

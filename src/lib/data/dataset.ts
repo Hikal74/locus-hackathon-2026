@@ -23,6 +23,31 @@ export const universities: University[] = [
     size: "medium",
     description:
       "A private research university in Cambridge, Massachusetts, widely regarded as one of the world's leading institutions for engineering and computer science.",
+    valuesSought: {
+      value: [
+        "Alignment with MIT's mission — using knowledge and education to make a better world",
+        "A collaborative and cooperative spirit — comfort working with others across differences",
+        "Initiative and hands-on creativity — actively building, not just studying",
+        "Comfort with risk-taking — willingness to attempt difficult things and grow from failure",
+        "A sense of responsibility to the MIT community",
+      ],
+      status: "verified",
+      sourceUrl: "https://mitadmissions.org/apply/process/what-we-look-for/",
+      verifiedOn: "2026-09-19",
+    },
+    campusLife: {
+      costOfLivingPerMonthUSD: { value: 2135, status: "verified", sourceUrl: "https://sfs.mit.edu/cost-of-attendance-class-of-2030/", verifiedOn: "2026-09-19" },
+      onCampusHousing: {
+        available: true,
+        note: "MIT's own cost-of-attendance estimate budgets $14,090/year for housing; most first-years live in a dorm.",
+      },
+      offCampusHousingNote:
+        "Cambridge/Boston is one of the most expensive US rental markets — shared off-campus apartments commonly run $1,200-$1,800/month per person, part of why most undergrads stay in MIT housing.",
+      neighborhoodNote:
+        "Kendall Square and Central Square nearby are dense with cafes, shops, and tech offices; the MBTA subway (T) reaches all of Boston/Cambridge without a car.",
+      socialClimateNote:
+        "A large, highly international student body in a major college-heavy metro — settling in socially is generally easier than in a smaller town, though the cost of living is a real adjustment.",
+    },
   },
   {
     id: "berkeley",
@@ -33,6 +58,32 @@ export const universities: University[] = [
     size: "large",
     description:
       "A public research university and flagship campus of the University of California system, highly ranked for computer science (EECS).",
+    valuesSought: {
+      value: [
+        "Leadership ability and initiative",
+        "Character, maturity, and demonstrated concern for others and the community",
+        "Intellectual independence and originality of thought",
+        "Tenacity — persistence through setbacks, not just achievement",
+        "Contribution to Berkeley's intellectual and cultural community specifically, not just strong stats",
+      ],
+      status: "needs_verification",
+      sourceUrl: "https://admissions.berkeley.edu/apply-to-berkeley/application-resources/selection-process/",
+      verifiedOn: "2026-09-19",
+    },
+    campusLife: {
+      costOfLivingPerMonthUSD: { value: 2616, status: "verified", sourceUrl: "https://financialaid.berkeley.edu/how-aid-works/student-budgets-cost-of-attendance/", verifiedOn: "2026-09-19" },
+      onCampusHousing: {
+        available: true,
+        priceRangePerYearUSD: { value: [15300, 29005], status: "verified", sourceUrl: "https://housing.berkeley.edu/rates-contracts-policies/rates/", verifiedOn: "2026-09-19" },
+        note: "Range spans triple-occupancy apartments to single suite rooms; most residence-hall rates include a mandatory meal plan.",
+      },
+      offCampusHousingNote:
+        "Berkeley/Oakland rents are high for a US college town; off-campus shared housing near campus is common but competitive, often booked before the semester starts.",
+      neighborhoodNote:
+        "Telegraph Avenue and Southside are dense with cafes, bookstores, and shops right at the campus edge; BART and AC Transit reach the wider Bay Area without a car.",
+      socialClimateNote:
+        "One of the most diverse, culturally active student populations in the US, in a large metro area — plenty to plug into, though the Bay Area's cost of living is genuinely high.",
+    },
   },
   {
     id: "asu",
@@ -43,6 +94,30 @@ export const universities: University[] = [
     size: "large",
     description:
       "A large public research university with one of the highest international enrollments in the US, housing CS within the Ira A. Fulton Schools of Engineering.",
+    valuesSought: {
+      value: [
+        "Inclusion and student success — \"measured not by whom it excludes, but by whom it includes and how they succeed\" (ASU Charter)",
+        "Public-value research and community impact",
+        "Academic readiness and rigor in coursework, not GPA alone",
+        "Fit with your intended major/college",
+      ],
+      status: "needs_verification",
+      sourceUrl: "https://www.asu.edu/about/charter-mission",
+      verifiedOn: "2026-09-19",
+    },
+    campusLife: {
+      costOfLivingPerMonthUSD: { value: 2011, status: "needs_verification", sourceUrl: "https://tuition.asu.edu/cost" },
+      onCampusHousing: {
+        available: true,
+        note: "ASU's 2026-27 cost-of-attendance estimate budgets $11,473/year for on-campus housing.",
+      },
+      offCampusHousingNote:
+        "Off-campus housing near ASU's Tempe campus averages roughly $1,400/month for a private room or studio; shared 2-3 bedroom units run lower per person ($875-$1,250). Downtown Tempe (Mill Avenue) is the closest, most walkable option.",
+      neighborhoodNote:
+        "Downtown Tempe/Mill Avenue is dense with restaurants, shops, and nightlife right next to campus; light rail connects to Phoenix and Scottsdale.",
+      socialClimateNote:
+        "One of the largest student populations in the US in a large, car-friendly Sun Belt metro — an active campus social scene, though summers are extremely hot and the city is spread out without a car.",
+    },
   },
   {
     id: "nu",
@@ -53,6 +128,30 @@ export const universities: University[] = [
     size: "medium",
     description:
       "Kazakhstan's flagship autonomous research university in the capital, English-medium instruction, modeled on Western research universities.",
+    valuesSought: {
+      value: [
+        "Merit and academic achievement — admission and progression are stated as entirely merit-based, not needs- or connections-based",
+        "Leadership potential and community engagement — NU frames its mission around developing the country's future leaders",
+        "Diversity and international outlook — draws students from all regions of Kazakhstan and 30+ countries",
+        "Readiness for English-medium, research-integrated study — reflected in its IELTS/UNT admission thresholds",
+      ],
+      status: "needs_verification",
+      sourceUrl: "https://nu.edu.kz/admissions/international-admission/international-admission_general/",
+      verifiedOn: "2026-09-19",
+    },
+    campusLife: {
+      costOfLivingPerMonthUSD: { value: 500, status: "needs_verification", sourceUrl: "https://www.unipage.net/en/177/nazarbayev_university" },
+      onCampusHousing: {
+        available: true,
+        priceRangePerYearUSD: { value: [2000, 3200], status: "needs_verification", sourceUrl: "https://smapse.com/nazarbayev-university/" },
+        note: "Over 80% of NU students live on campus per the university's own housing page.",
+      },
+      offCampusHousingNote: "Most students live on campus; off-campus 1-bedroom rentals in Astana run roughly $250-400/month near the center.",
+      neighborhoodNote:
+        "Campus sits in Astana's modern Left Bank district, largely self-contained with its own dining/services; city malls and transit are a short ride away.",
+      socialClimateNote:
+        "Built as an international, English-medium campus drawing 30+ nationalities, which eases adjustment on campus — though daily life beyond it in Astana is predominantly Russian/Kazakh-speaking.",
+    },
   },
   {
     id: "kbtu",
@@ -63,6 +162,28 @@ export const universities: University[] = [
     size: "medium",
     description:
       "A technical university in Almaty known for ABET-accredited IT/engineering programs and strong industry ties.",
+    valuesSought: {
+      value: [
+        "Practical, industry-ready skills — mission centers on real-life projects, internships, and industry partnerships over theory alone",
+        "STEM aptitude aligned with Kazakhstan's core industries (oil & gas, IT, finance, telecom)",
+        "English proficiency — IELTS 5.5+ is a baseline expectation",
+        "Readiness for an ABET-accredited, internationally benchmarked curriculum",
+      ],
+      status: "needs_verification",
+      sourceUrl: "https://kbtu.edu.kz/en/",
+      verifiedOn: "2026-09-19",
+    },
+    campusLife: {
+      costOfLivingPerMonthUSD: { value: 450, status: "needs_verification", sourceUrl: "https://studyinkz.kz/blog/real-cost-of-living-kazakhstan-international-students" },
+      onCampusHousing: {
+        available: true,
+        note: "KBTU's Jastar City dormitory offers furnished private rooms with 24/7 security; exact fees weren't published anywhere we could confirm — contact KBTU admissions for current rates.",
+      },
+      offCampusHousingNote: "Private 1-bedroom apartments near campus run roughly $250-400/month, part of Almaty's general rental market.",
+      neighborhoodNote: "Central Almaty, metro-accessible, walkable to much of the city center with everyday shops and cafes nearby.",
+      socialClimateNote:
+        "Mixed Kazakh/Russian-speaking city environment; KBTU's international accreditations bring some international-student presence, but campus life is less English-centric day-to-day than NU's.",
+    },
   },
   {
     id: "kaznu",
@@ -73,6 +194,30 @@ export const universities: University[] = [
     size: "large",
     description:
       "Kazakhstan's largest and highest-ranked national university (QS #166, 2026), with 25,000+ students from 50+ countries.",
+    valuesSought: {
+      value: [
+        "Academic excellence and research potential — explicit ambition to be a 'world-class research university'",
+        "National/civic contribution — mission ties graduate success to Kazakhstan's socio-economic development",
+        "Broad intellectual and ethical development — pairs technical training with character development",
+        "Global competitiveness — repeated emphasis on international rankings and standards",
+      ],
+      status: "needs_verification",
+      sourceUrl: "https://farabi.university/university/about?lang=en",
+      verifiedOn: "2026-09-19",
+    },
+    campusLife: {
+      costOfLivingPerMonthUSD: { value: 300, status: "needs_verification", sourceUrl: "https://collegedunia.com/kazakhstan/university/3770-al-farabi-kazakh-national-university-almaty" },
+      onCampusHousing: {
+        available: true,
+        priceRangePerYearUSD: { value: [960, 1050], status: "needs_verification", sourceUrl: "https://collegedunia.com/kazakhstan/university/3770-al-farabi-kazakh-national-university-almaty" },
+        note: "17 on-campus dormitories; rooms priced around $80-85/month on a double-sharing basis.",
+      },
+      offCampusHousingNote:
+        "Off-campus 1-bedroom rentals near transit run roughly $250-400/month in Almaty's broader market, though most students use the 17 on-campus dorms.",
+      neighborhoodNote: "Large, established central-Almaty campus with its own facilities; surrounding city offers extensive shops, markets, and public transport.",
+      socialClimateNote:
+        "Kazakhstan's largest and most internationally diverse university (50+ countries represented per its own materials), though daily campus life outside English-medium programs leans Kazakh/Russian.",
+    },
   },
   {
     id: "tsinghua",
@@ -83,6 +228,32 @@ export const universities: University[] = [
     size: "large",
     description:
       "One of China's top research universities, globally top-ranked in computer science and engineering.",
+    valuesSought: {
+      value: [
+        "Academic excellence — strong transcripts plus SAT/ACT/A-Level/AP/IB or equivalent results",
+        "English (or Chinese) language proficiency",
+        "Research experience or competition success, especially for STEM applicants",
+        "Leadership and extracurricular involvement tied to your intended field",
+        "Alignment with Tsinghua's academic priorities and development goals",
+      ],
+      status: "needs_verification",
+      sourceUrl: "https://international.join-tsinghua.edu.cn/Admission1/Eligibility.htm",
+      verifiedOn: "2026-09-19",
+    },
+    campusLife: {
+      costOfLivingPerMonthUSD: { value: 450, status: "needs_verification", sourceUrl: "https://wentchina.com/living-cost-in-china-for-international-students-2026-monthly-budget-city-by-city-comparison-and-money-saving-tips-updated-july/" },
+      onCampusHousing: {
+        available: true,
+        priceRangePerYearUSD: { value: [1500, 2050], status: "verified", sourceUrl: "https://is.tsinghua.edu.cn/dfadfgasq/Accommodationq.htm", verifiedOn: "2026-09-19" },
+        note: "Zijing dorms: RMB 30-40/bed/day for double/triple rooms; RMB 80/day for single/AB rooms.",
+      },
+      offCampusHousingNote:
+        "Most international students use on-campus dorms; private 1-bedroom apartments near campus in Beijing run roughly $400-800/month if living off-campus.",
+      neighborhoodNote:
+        "Northwest Beijing university district — dense with shops, canteens, and metro access; Line 13 and Line 15 both serve the area.",
+      socialClimateNote:
+        "Large, established international student population and dedicated international scholars center, though daily campus life is conducted primarily in Chinese outside international-program courses.",
+    },
   },
   {
     id: "pku",
@@ -93,6 +264,31 @@ export const universities: University[] = [
     size: "large",
     description:
       "One of China's oldest and most prestigious universities, consistently ranked among the top in Asia.",
+    valuesSought: {
+      value: [
+        "Academic excellence and demonstrated passion for the chosen subject",
+        "Personal integrity and character, reviewed alongside academic record",
+        "Research projects, leadership roles, and extracurricular achievement",
+        "Intellectual curiosity, initiative, and social impact",
+        "Commitment to making a broader (global) impact",
+      ],
+      status: "needs_verification",
+      sourceUrl: "https://www.china-admissions.com/blog/peking-university-application-guide-2025/",
+      verifiedOn: "2026-09-19",
+    },
+    campusLife: {
+      costOfLivingPerMonthUSD: { value: 470, status: "needs_verification", sourceUrl: "https://wentchina.com/living-cost-in-china-for-international-students-2026-monthly-budget-city-by-city-comparison-and-money-saving-tips-updated-july/" },
+      onCampusHousing: {
+        available: true,
+        priceRangePerYearUSD: { value: [2100, 3500], status: "needs_verification", sourceUrl: "https://globalscholarships.com/cost-of-studying-peking-university/" },
+        note: "Self-funded international undergrads are no longer guaranteed a dorm bed as of 2025 — confirm current availability directly with PKU's International Student Office before counting on it.",
+      },
+      offCampusHousingNote:
+        "If on-campus housing isn't available, students arrange private off-campus housing in Beijing, roughly $400-800/month for a 1-bedroom near campus.",
+      neighborhoodNote: "Haidian district university belt — extensive shops, bookstores, and metro/bus access shared with Tsinghua and other nearby campuses.",
+      socialClimateNote:
+        "One of China's most internationally diverse campuses, but the same caveat applies: campus and city life run predominantly in Chinese outside coursework.",
+    },
   },
   {
     id: "shanghaitech",
@@ -103,6 +299,30 @@ export const universities: University[] = [
     size: "small",
     description:
       "Founded in 2013 with the Chinese Academy of Sciences; one of the few major Chinese universities with all programs taught in English by default.",
+    valuesSought: {
+      value: [
+        "\"Aspiration, Success, Service for the Country, and Enriching the People\" — ShanghaiTech's stated school-running philosophy",
+        "Strong science and engineering foundation",
+        "Scientific innovation and critical thinking",
+        "Humanistic accomplishment alongside technical ability",
+      ],
+      status: "verified",
+      sourceUrl: "https://www.shanghaitech.edu.cn/eng/2021/0112/c1765a58996/page.htm",
+      verifiedOn: "2026-09-19",
+    },
+    campusLife: {
+      costOfLivingPerMonthUSD: { value: 500, status: "needs_verification", sourceUrl: "https://wentchina.com/cost-of-living-in-china-city-by-city-guide-for-students-2026-2/" },
+      onCampusHousing: {
+        available: true,
+        note: "On-campus 4-person dorms are standard for undergrads; no reliably-sourced per-year price was found — a widely-repeated ~$200/year figure looked implausibly low for Shanghai and was deliberately not used. Verify directly with ShanghaiTech before relying on a specific number.",
+      },
+      offCampusHousingNote:
+        "Shanghai off-campus rent runs high citywide — $600-900/month for outer districts, $800-1,800/month centrally — so most students stay in the on-campus dorms.",
+      neighborhoodNote:
+        "Zhangjiang Hi-Tech Park (Pudong) — a modern science-park district with metro Line 2 access; more corporate/research campus than a traditional dense city neighborhood.",
+      socialClimateNote:
+        "Small (~2,000 undergrad), English-friendly campus by Chinese-university standards — most programs taught in English — but the surrounding Zhangjiang area itself is quieter and less socially dense than central Shanghai.",
+    },
   },
 ];
 
@@ -290,7 +510,7 @@ export const programs: Program[] = [
     degreeLevel: "bachelor",
     tuitionPerYearUSD: { value: 5500, status: "demo_data" },
     languageRequirements: [
-      { language: "Chinese", test: "HSK", minScore: "HSK 4 to enter (pass HSK 5 within year 1) for bilingual track; English-taught tracks need no Chinese" },
+      { language: "Chinese", test: "HSK", minScore: "4 to enter (pass HSK 5 within year 1) for bilingual track; English-taught tracks need no Chinese" },
       { language: "English", test: "TOEFL", minScore: "No published minimum; score report required" },
     ],
     examRequirements: [{ name: "Tsinghua international applicant review", required: true, notes: "Academic review and possible interview; specifics vary by track." }],
@@ -317,7 +537,7 @@ export const programs: Program[] = [
       sourceUrl: "https://www.shiksha.com/studyabroad/china/universities/peking-university/admissions",
       verifiedOn: "2026-09-16",
     },
-    languageRequirements: [{ language: "Chinese", test: "HSK", minScore: "HSK 4–5 typical for Chinese-taught programs (varies)" }],
+    languageRequirements: [{ language: "Chinese", test: "HSK", minScore: "4–5 typical for Chinese-taught programs (varies)" }],
     examRequirements: [
       {
         name: "PKU international freshman exam (March) or document review",
@@ -662,7 +882,7 @@ export const programs: Program[] = [
     field: "engineering",
     degreeLevel: "bachelor",
     tuitionPerYearUSD: { value: 5500, status: "demo_data" },
-    languageRequirements: [{ language: "Chinese", test: "HSK", minScore: "HSK 4 typical entry, HSK 5 by year 1 for bilingual track" }],
+    languageRequirements: [{ language: "Chinese", test: "HSK", minScore: "4 typical entry, HSK 5 by year 1 for bilingual track" }],
     examRequirements: [{ name: "Tsinghua international applicant review", required: true }],
     deadlines: [{ label: "Application window (typical, unconfirmed)", date: "2027-03-01" }],
     scholarships: [
@@ -681,7 +901,7 @@ export const programs: Program[] = [
     field: "business",
     degreeLevel: "bachelor",
     tuitionPerYearUSD: { value: 3940, status: "demo_data" },
-    languageRequirements: [{ language: "Chinese", test: "HSK", minScore: "HSK 4–5 typical (varies)" }],
+    languageRequirements: [{ language: "Chinese", test: "HSK", minScore: "4–5 typical (varies)" }],
     examRequirements: [{ name: "PKU international freshman exam (March) or document review", required: true }],
     deadlines: [{ label: "Online application window", date: "2027-01-01" }],
     scholarships: [

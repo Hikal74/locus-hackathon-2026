@@ -30,6 +30,26 @@ describe("buildRoadmap", () => {
     const tasks = buildRoadmap(testProfile, []);
     expect(tasks.some((t) => t.id.startsWith("apply-"))).toBe(false);
   });
+
+  it("gives every fixed-id task an explicit microtask breakdown", () => {
+    const profile = { ...testProfile, budgetPerYearUSD: 15000, preferences: {} };
+    const { recommendations } = getRecommendations(profile, [testUniversity], [testProgram]);
+    const tasks = buildRoadmap(profile, recommendations);
+    for (const id of ["documents-transcripts", "scholarships", "recommendation-letters", "essays"]) {
+      const task = tasks.find((t) => t.id === id);
+      expect(task?.microtasks?.length).toBeGreaterThan(1);
+    }
+  });
+
+  it("gives dynamic gap/apply tasks a generic microtask template", () => {
+    const profile = { ...testProfile, languageLevel: {}, examsCompleted: [] };
+    const { recommendations } = getRecommendations(profile, [testUniversity], [testProgram]);
+    const tasks = buildRoadmap(profile, recommendations);
+    const gapTask = tasks.find((t) => t.id.startsWith("gap-"));
+    expect(gapTask?.microtasks?.length).toBeGreaterThan(1);
+    const applyTask = tasks.find((t) => t.id.startsWith("apply-"));
+    expect(applyTask?.microtasks?.length).toBeGreaterThan(1);
+  });
 });
 
 describe("computeReadiness", () => {
@@ -77,5 +97,10 @@ describe("buildPortfolioTasks", () => {
   it("never depends on recommendations — always returns the same tasks regardless of matches", () => {
     const tasks = buildPortfolioTasks(testProfile);
     expect(tasks.length).toBeGreaterThan(0);
+  });
+
+  it("gives every portfolio task an explicit multi-step breakdown", () => {
+    const tasks = buildPortfolioTasks(testProfile);
+    expect(tasks.every((t) => (t.microtasks?.length ?? 0) > 1)).toBe(true);
   });
 });

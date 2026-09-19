@@ -25,6 +25,15 @@ export function NavBar() {
         <Link href="/" className="text-lg font-semibold tracking-tight text-ink">
           Pathlight
         </Link>
+        <Link
+          href="/translate"
+          className={cn(
+            "rounded-[var(--radius-pill)] border-2 border-dashed px-3 py-1.5 text-sm transition-colors",
+            pathname === "/translate" ? "border-ink bg-ink text-on-primary" : "border-line-soft text-ink-soft hover:border-ink"
+          )}
+        >
+          De-Bureaucratizer
+        </Link>
         {profile && (
           <nav className="flex w-full flex-nowrap items-center gap-1 overflow-x-auto text-sm sm:w-auto sm:ml-auto">
             {STEPS.map((step) => {
