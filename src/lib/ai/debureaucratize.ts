@@ -1,6 +1,6 @@
 import { Type } from "@google/genai";
 import { getGeminiClient, isAiConfigured, AI_MODEL } from "./client";
-import { classifyGeminiError, type AiFailureReason } from "./errors";
+import { classifyGeminiError, logGeminiFailure, type AiFailureReason } from "./errors";
 import { DebureaucratizeResultSchema, type DebureaucratizeResult } from "./debureaucratize-schema";
 
 export type DebureaucratizeFailureReason = AiFailureReason;
@@ -74,6 +74,8 @@ export async function generateDebureaucratized(text: string): Promise<Debureaucr
 
     return { ok: true, data: validated.data };
   } catch (error) {
-    return { ok: false, reason: classifyGeminiError(error) };
+    const reason = classifyGeminiError(error);
+    logGeminiFailure("debureaucratize", reason, error);
+    return { ok: false, reason };
   }
 }
